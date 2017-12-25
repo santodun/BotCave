@@ -16,15 +16,10 @@
 	    // You create one by telling it which joystick it's on and which button
 	    // number it is.
 		private static final int _winchRaiseButton = 1;
-		private static final int _winchLowerButton = 2;
-		private static final int _lightBankAButton = 3;
-		private static final int _lightBankBButton = 4;
-		private static final int _shooterButton = 5;
 		
-	    public static Joystick joyStick;
+		public static Joystick joyStick;
 	    public static Joystick buttonStation;
 	    public static Button winchRaiseButton;
-	    public static Button winchLowerButton;
 	    
 	    public OperatorInterface(Command winchCommand,
 	    						int io_joystick, int io_button)

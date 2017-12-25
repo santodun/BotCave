@@ -15,16 +15,18 @@ public class RobotMap {
     // number and the module. For example you with a rangefinder:
     // public static int rangefinderPort = 1;
     // public static int rangefinderModule = 1;
-	public static final int PWM_DriveTrainLeftFrontMotor = 0;
-	public static final int PWM_DriveTrainRightFrontMotor = 1;
-	public static final int PWM_DriveTrainLeftRearMotor = 2;
-	public static final int PWM_DriveTrainRightRearMotor = 3;
-	public static final int PWM_WinchMotor = 4;
-		
-	public static final int DIO_DriveTrainLeftEncoder = 0;
-	public static final int DIO_DriveTrainRightEncoder = 1;
-	public static final int DIO_WinchLimitSwitch = 2;
+	public static final int PWM_Motor = 0;
+	public static final int PWM_leftFrontMotor = 1;
+	public static final int PWM_rightFrontMotor = 2;
+	public static final int PWM_leftRearMotor = 3;
+	public static final int PWM_rightRearMotor = 4;
+	public static final int PWM_winchMotor = 5;
 	
-	public static final int IO_JoystickPort = 0;
-	public static final int IO_ButtonStationPort = 0;
+	public static final int DIO_leftEncoder = 0;
+	public static final int DIO_rightEncoder = 1;
+	public static final int DIO_limitSwitch = 2;
+	
+	public static final int IO_ButtonStation = 0;
+	public static final int IO_Joystick = 0;
 }
+	
