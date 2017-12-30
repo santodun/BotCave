@@ -1,6 +1,6 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.subsystems.TestMotor;
+import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -10,39 +10,46 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestCommand extends Command 
 {
-	private static TestMotor _motor;
+	private static RangeFinder _rangeFinder;
+	private static Timer _timer;
+	private boolean _isDone = false;
 	
-	public TestCommand(TestMotor motor) 
+	public TestCommand(RangeFinder ranger) 
     {
-		_motor = motor;
-        // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
-    	//requires(Robot.testMotor);
+		_rangeFinder = ranger;
+		_timer = new Timer();
     }
 
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    	_motor.Stop();
-    	_motor.Reset();
+    
+    	_timer.reset();
+    	_timer.start();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    
+    	//System.out.print("RawBits\tVoltage\tAverageBits\tAverageVoltage\n");
+    	if (_timer.get() < 60.0)
+    	{
+    		System.out.printf("Range: %f\n", _rangeFinder.GetRangeInInches());
+    		_timer.delay(1.0);
+    	}	else
+    		_isDone = true;
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-    	return false;
+    	return _isDone;
     }
 
     // Called once after isFinished returns true
     protected void end() 
     {
-    	_motor.Stop();
+    	//_motor.Stop();
     }
 
     // Called when another command which requires one or more of the same

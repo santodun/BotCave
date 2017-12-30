@@ -24,11 +24,11 @@
 	    public OperatorInterface(Command winchCommand,
 	    						int io_joystick, int io_button)
 	    {
-	        joyStick = new Joystick(io_joystick);
-	        buttonStation = new Joystick(io_button);
-	        winchRaiseButton = new JoystickButton(buttonStation, _winchRaiseButton);
+//	        joyStick = new Joystick(io_joystick);
+//	        buttonStation = new Joystick(io_button);
+//	        winchRaiseButton = new JoystickButton(buttonStation, _winchRaiseButton);
 	     
-	        winchRaiseButton.whileHeld(winchCommand);
+	       // winchRaiseButton.whileHeld(winchCommand);
 	    }
 	    
 	    //

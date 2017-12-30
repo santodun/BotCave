@@ -1,5 +1,5 @@
-/bin/
-/build/
-/dist/
+bin/*
+build/*
+*dist/*
 *.jar
 *.class
