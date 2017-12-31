@@ -1,6 +1,6 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.subsystems.Accelerometer;
+import org.usfirst.frc.team1289.robot.subsystems.Switch;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestCommand extends Command 
 {
-	private static Accelerometer _acc;
+	private static Switch _switch;
 	private static Timer _timer;
 	private boolean _isDone = false;
 	
-	public TestCommand(Accelerometer acc) 
+	public TestCommand(Switch sw) 
     {
-		_acc = acc;
+		_switch = sw;
 		_timer = new Timer();
     }
 
@@ -33,7 +33,10 @@ public class TestCommand extends Command
     	//System.out.print("RawBits\tVoltage\tAverageBits\tAverageVoltage\n");
     	if (_timer.get() < 60.0)
     	{
-    		System.out.printf("%f\t%f\t%f\n", _acc.Get_X(), _acc.Get_Y(), _acc.Get_Z());
+    		if (_switch.Closed())
+    			System.out.printf("Closed\n");
+    		else
+    			System.out.printf("Open\n");
     		
     		_timer.delay(1.0);
     	}	else

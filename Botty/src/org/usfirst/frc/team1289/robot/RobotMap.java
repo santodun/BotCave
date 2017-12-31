@@ -25,6 +25,7 @@ public class RobotMap {
 	public static final int DIO_leftEncoder = 0;
 	public static final int DIO_rightEncoder = 1;
 	public static final int DIO_limitSwitch = 2;
+	public static final int DIO_Switch = 3;
 	
 	public static final int IO_ButtonStation = 0;
 	public static final int IO_Joystick = 0;
