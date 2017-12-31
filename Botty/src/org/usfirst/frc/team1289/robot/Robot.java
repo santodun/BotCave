@@ -26,6 +26,7 @@ public class Robot extends IterativeRobot {
 	private static DriveTrain _driveTrain;
 	private static Winch _winch;
 	private static RangeFinder _rangeFinder;
+	private static Gyroscope _gyro;
 	
 	private static Command _testCommand;
 	private static Command _driveViaEncoderCommand;
@@ -63,12 +64,12 @@ public class Robot extends IterativeRobot {
     								_ioMap.DIO_leftEncoder, _ioMap.DIO_rightEncoder);
     	_winch = new Winch(_ioMap.PWM_winchMotor, _ioMap.DIO_limitSwitch);
     	_rangeFinder = new RangeFinder(_ioMap.AIO_RangeFinder);
-    	
+    	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
     }
     
     private void CommandInit()
     {
-    	_testCommand = new TestCommand(_rangeFinder);
+    	_testCommand = new TestCommand(_gyro);
     	_winchRaiseCommand  = new WinchRaise(_winch);
     	_driveViaEncoderCommand = new DriveViaEncoder(_driveTrain, 0.1, 130.0);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);

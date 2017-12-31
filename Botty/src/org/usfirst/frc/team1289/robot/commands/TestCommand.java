@@ -1,6 +1,6 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
+import org.usfirst.frc.team1289.robot.subsystems.Gyroscope;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestCommand extends Command 
 {
-	private static RangeFinder _rangeFinder;
+	private static Gyroscope _gyro;
 	private static Timer _timer;
 	private boolean _isDone = false;
 	
-	public TestCommand(RangeFinder ranger) 
+	public TestCommand(Gyroscope gyro) 
     {
-		_rangeFinder = ranger;
+		_gyro = gyro;
 		_timer = new Timer();
     }
 
@@ -34,7 +34,8 @@ public class TestCommand extends Command
     	//System.out.print("RawBits\tVoltage\tAverageBits\tAverageVoltage\n");
     	if (_timer.get() < 60.0)
     	{
-    		System.out.printf("Range: %f\n", _rangeFinder.GetRangeInInches());
+    		System.out.printf("Heading: %f\tRotationRate: %f\n", _gyro.GetHeading(), _gyro.GetRotationRate());
+    		
     		_timer.delay(1.0);
     	}	else
     		_isDone = true;

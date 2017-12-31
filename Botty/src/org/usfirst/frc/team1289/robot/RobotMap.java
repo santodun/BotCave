@@ -29,6 +29,7 @@ public class RobotMap {
 	public static final int IO_ButtonStation = 0;
 	public static final int IO_Joystick = 0;
 	
+	public static final int AIO_Gyroscope = 0;
 	public static final int AIO_RangeFinder = 1;
 }
 	
