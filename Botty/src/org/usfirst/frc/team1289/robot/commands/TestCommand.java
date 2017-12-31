@@ -1,6 +1,6 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.subsystems.Gyroscope;
+import org.usfirst.frc.team1289.robot.subsystems.Accelerometer;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -10,20 +10,19 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestCommand extends Command 
 {
-	private static Gyroscope _gyro;
+	private static Accelerometer _acc;
 	private static Timer _timer;
 	private boolean _isDone = false;
 	
-	public TestCommand(Gyroscope gyro) 
+	public TestCommand(Accelerometer acc) 
     {
-		_gyro = gyro;
+		_acc = acc;
 		_timer = new Timer();
     }
 
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    
     	_timer.reset();
     	_timer.start();
     }
@@ -34,7 +33,7 @@ public class TestCommand extends Command
     	//System.out.print("RawBits\tVoltage\tAverageBits\tAverageVoltage\n");
     	if (_timer.get() < 60.0)
     	{
-    		System.out.printf("Heading: %f\tRotationRate: %f\n", _gyro.GetHeading(), _gyro.GetRotationRate());
+    		System.out.printf("%f\t%f\t%f\n", _acc.Get_X(), _acc.Get_Y(), _acc.Get_Z());
     		
     		_timer.delay(1.0);
     	}	else
