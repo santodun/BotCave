@@ -1,1 +1,11 @@
-/bin/
+/bin
+/build
+/dist
+*.class
+*.jar
+*.log
+*.war
+*.ear
+*.tar.gz
+*.tgz
+*.log
