@@ -20,15 +20,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 
-	public static Winch winch;
-	public static DriveTrain drivetrain;
-	public static OperatorInterface driverStation;
-	public static Camera _camera;
 	private static RobotMap _ioMap = new RobotMap();
 	
-	private static Command _winchCommand;
-	private static Command _driveViaEncoder;
-	private static Command _driveViaStick;
+	private static TestMotor _testMotor;
+	private static DriveTrain _driveTrain;
+	private static Winch _winch;
+	private static RangeFinder _rangeFinder;
+	private static Gyroscope _gyro;
+	private static Accelerometer _accelerometer;
+	private static Switch _switch;
+	
+	private static Command _testCommand;
+	private static Command _driveViaEncoderCommand;
+	private static Command _driveViaStickCommand;
+	private static Command _winchRaiseCommand;
+	
+	public static OperatorInterface DriverStation;
 
     Command autonomousCommand;
     Command teleopCommand;
@@ -42,32 +49,34 @@ public class Robot extends IterativeRobot {
     	// Must happen in this order
     	SubsystemInit();
     	CommandInit();
-    	driverStation = new OperatorInterface(_winchCommand, _ioMap.IO_JoystickPort, 
-    											_ioMap.IO_ButtonStationPort);
+    	DriverStation = new OperatorInterface(_winchRaiseCommand, _ioMap.IO_Joystick, _ioMap.IO_ButtonStation);
+    	
     	chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
       //  SmartDashboard.putData("Auto mode", chooser);
-    	_camera = new Camera();
-    	_camera.Start();
+    	
     }
 	
     private void SubsystemInit()
     {
-    	winch = new Winch(_ioMap.PWM_WinchMotor, _ioMap.DIO_WinchLimitSwitch);
-    	drivetrain = new DriveTrain(_ioMap.PWM_DriveTrainLeftFrontMotor,
-    								_ioMap.PWM_DriveTrainLeftRearMotor,
-    								_ioMap.PWM_DriveTrainRightFrontMotor,
-    								_ioMap.PWM_DriveTrainRightRearMotor,
-    								_ioMap.DIO_DriveTrainLeftEncoder,
-    								_ioMap.DIO_DriveTrainRightEncoder);
+    	_testMotor = new TestMotor(_ioMap.PWM_Motor);
+    	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
+    								_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
+    								_ioMap.DIO_leftEncoder, _ioMap.DIO_rightEncoder);
+    	_winch = new Winch(_ioMap.PWM_winchMotor, _ioMap.DIO_limitSwitch);
+    	_rangeFinder = new RangeFinder(_ioMap.AIO_RangeFinder);
+    	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
+    	_accelerometer = new Accelerometer();
+    	_switch = new Switch(_ioMap.DIO_Switch);
     }
     
     private void CommandInit()
     {
-    	_winchCommand = new WinchRaise();
-    	_driveViaEncoder = new DriveViaEncoder(0.1, 130.0);
-    	_driveViaStick = new DriveViaStick();
+    	_testCommand = new TestCommand(_switch);
+    	_winchRaiseCommand  = new WinchRaise(_winch);
+    	_driveViaEncoderCommand = new DriveViaEncoder(_driveTrain, 0.1, 130.0);
+    	_driveViaStickCommand = new DriveViaStick(_driveTrain);
     	
     }
 	/**
@@ -80,7 +89,7 @@ public class Robot extends IterativeRobot {
     }
 	
 	public void disabledPeriodic() {
-		Scheduler.getInstance().run();
+		//Scheduler.getInstance().run();
 	}
 
 	/**
@@ -93,7 +102,7 @@ public class Robot extends IterativeRobot {
 	 * or additional comparisons to the switch structure below with additional strings & commands.
 	 */
     public void autonomousInit() {
-        autonomousCommand = _driveViaEncoder;
+        autonomousCommand = _testCommand;
         
 		/* String autoSelected = SmartDashboard.getString("Auto Selector", "Default");
 		switch(autoSelected) {
@@ -126,7 +135,7 @@ public class Robot extends IterativeRobot {
         if (autonomousCommand != null) 
         	autonomousCommand.cancel();
         
-        teleopCommand = _driveViaStick;
+        teleopCommand = _testCommand;
         teleopCommand.start();
     }
 

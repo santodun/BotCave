@@ -41,7 +41,7 @@ public class DriveTrain extends Subsystem
 		_robotDrive = new RobotDrive(_leftFrontMotor, _leftRearMotor,
 									_rightFrontMotor, _rightRearMotor);
 		
-		_robotDrive.setSafetyEnabled(true);
+		_robotDrive.setSafetyEnabled(false);
 		_robotDrive.setExpiration(0.1);
 		_robotDrive.setSensitivity(0.1);
 		_robotDrive.setMaxOutput(1.0);
@@ -92,17 +92,11 @@ public class DriveTrain extends Subsystem
     public void ArcadeDrive()
     {
     	/* Note the negatation */
-    	double moveValue = - Robot.driverStation.joyStick.getY();
-    	double rotateValue = - Robot.driverStation.joyStick.getX();
-    	
-    	SmartDashboard.putNumber("stickRawMoveValue", moveValue);
-    	SmartDashboard.putNumber("stickRawRotateValue", rotateValue);
+    	double moveValue = 0; // - Robot.DriverStation.joyStick.getY();
+    	double rotateValue = 0; //- Robot.DriverStation.joyStick.getX();
     	
     	moveValue = ScaleValue(moveValue);
     	rotateValue = ScaleValue(rotateValue);
-    	
-    	SmartDashboard.putNumber("stickScaledMoveValue", moveValue);
-    	SmartDashboard.putNumber("stickScaledRotateValue", rotateValue);
     	
     	_robotDrive.arcadeDrive(moveValue, rotateValue);
     }
