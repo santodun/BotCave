@@ -1,7 +1,9 @@
 
 package org.usfirst.frc.team1289.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -21,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 
 	private static RobotMap _ioMap = new RobotMap();
-	
+		
 	private static TestMotor _testMotor;
 	private static DriveTrain _driveTrain;
 	private static Winch _winch;
@@ -31,11 +33,11 @@ public class Robot extends IterativeRobot {
 	private static Switch _switch;
 	
 	private static Command _testCommand;
-	private static Command _driveViaEncoderCommand;
+	private static Command _driveToDistanceCommand;
 	private static Command _driveViaStickCommand;
 	private static Command _winchRaiseCommand;
 	
-	public static OperatorInterface DriverStation;
+	public static OperatorInterface OperatorStation;
 
     Command autonomousCommand;
     Command teleopCommand;
@@ -49,7 +51,9 @@ public class Robot extends IterativeRobot {
     	// Must happen in this order
     	SubsystemInit();
     	CommandInit();
-    	DriverStation = new OperatorInterface(_winchRaiseCommand, _ioMap.IO_Joystick, _ioMap.IO_ButtonStation);
+    	OperatorStation = new OperatorInterface(_winchRaiseCommand, _ioMap.IO_Joystick, _ioMap.IO_ButtonStation);
+    	
+    	SmartDashboard.putString("position", "C");
     	
     	chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
@@ -75,7 +79,7 @@ public class Robot extends IterativeRobot {
     {
     	_testCommand = new TestCommand(_switch);
     	_winchRaiseCommand  = new WinchRaise(_winch);
-    	_driveViaEncoderCommand = new DriveViaEncoder(_driveTrain, 0.1, 130.0);
+    	_driveToDistanceCommand = new DriveToDistance(_driveTrain, 0.1, 130.0);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);
     	
     }
@@ -103,6 +107,9 @@ public class Robot extends IterativeRobot {
 	 */
     public void autonomousInit() {
         autonomousCommand = _testCommand;
+        GetAutoModeCommand();
+                
+//        System.out.printf("%s %s\n", position, gameData);
         
 		/* String autoSelected = SmartDashboard.getString("Auto Selector", "Default");
 		switch(autoSelected) {
@@ -151,5 +158,54 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
         LiveWindow.run();
+    }
+    
+    private void GetAutoModeCommand()
+    {
+    	String gameData;
+        gameData = DriverStation.getInstance().getGameSpecificMessage();
+        String position = SmartDashboard.getString("position", "C");
+        switch (position)
+        {
+        case "C":
+        case "c":
+        	if (gameData.charAt(0) == 'L')
+        		System.out.println("Center, left");
+        	else
+        		System.out.println("Center, right");
+        	break;
+        	
+        case "L":
+        case "l":
+        	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
+        		System.out.println("switch straight clw");
+        	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
+        		System.out.println("switch straight clw");
+        	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
+        		System.out.println("scale straight clw");
+        	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
+        		System.out.println("wait for teleop");
+        	else
+        		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
+        	break;
+    	
+        case "R": 
+        case "r": 
+        	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
+        		System.out.println("wait for teleop");
+        	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
+        		System.out.println("scale straight cclw");
+        	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
+        		System.out.println("switch straight cclw");
+        	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
+        		System.out.println("switch straight cclw");
+        	else
+        		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
+        	break;
+        	
+        	default:
+        		System.out.printf("unknown position %s \n", position);
+        }
+
     }
 }

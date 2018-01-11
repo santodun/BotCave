@@ -4,7 +4,8 @@ package org.usfirst.frc.team1289.robot.subsystems;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 
 import org.usfirst.frc.team1289.robot.OperatorInterface;
@@ -12,6 +13,12 @@ import org.usfirst.frc.team1289.robot.Robot;
 import org.usfirst.frc.team1289.robot.commands.*;
 
 import edu.wpi.first.wpilibj.Counter;
+
+
+enum RotationalDirection 
+{
+	CLOCKWISE, COUNTERCLOCKWISE
+}
 
 /**
  *
@@ -25,30 +32,33 @@ public class DriveTrain extends Subsystem
 	private static Talon _rightFrontMotor;
 	private static Talon _leftRearMotor;
 	private static Talon _rightRearMotor;
+	private static SpeedControllerGroup _leftMotors, _rightMotors;
 	private static Counter _leftEncoder;
 	private static Counter _rightEncoder; 
-	private static RobotDrive _robotDrive;
+	private static DifferentialDrive _robotDrive;
 	
 	public DriveTrain(int io_leftFront, int io_rightFront,
 						int io_leftRear, int io_rightRear,
 						int io_leftEncoder, int io_rightEncoder)
 	{
 		_leftFrontMotor = new Talon(io_leftFront);
-		_rightFrontMotor = new Talon(io_rightFront);
 		_leftRearMotor = new Talon(io_leftRear);
-		_rightRearMotor = new Talon(io_rightRear);
+		_leftMotors = new SpeedControllerGroup(_leftFrontMotor, _leftRearMotor);
 		
-		_robotDrive = new RobotDrive(_leftFrontMotor, _leftRearMotor,
-									_rightFrontMotor, _rightRearMotor);
+		_rightFrontMotor = new Talon(io_rightFront);
+		_rightRearMotor = new Talon(io_rightRear);
+		_rightMotors = new SpeedControllerGroup(_rightFrontMotor, _rightRearMotor);
+		
+		_robotDrive = new DifferentialDrive(_leftMotors, _rightMotors);
 		
 		_robotDrive.setSafetyEnabled(false);
 		_robotDrive.setExpiration(0.1);
-		_robotDrive.setSensitivity(0.1);
 		_robotDrive.setMaxOutput(1.0);
-		_robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
-        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
-        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
-        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
+		
+//		_robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
+//        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
+//        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
+//        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
         
     	_leftEncoder = new Counter(io_leftEncoder);
 		_rightEncoder = new Counter(io_rightEncoder);
@@ -74,7 +84,15 @@ public class DriveTrain extends Subsystem
     public void Move(double speed)
     {
     	boolean squareInputs = false; 
-    	_robotDrive.arcadeDrive(0.3 /*speed*/, 0.0, squareInputs);
+    	_robotDrive.arcadeDrive(speed, 0.0, squareInputs);
+    }
+    
+    public void Rotate(RotationalDirection direction)
+    {
+    	if (direction == RotationalDirection.CLOCKWISE)
+    		_robotDrive.arcadeDrive(0.2, 0.3);
+    	else
+    		_robotDrive.arcadeDrive(-0.2, -0.3);
     }
 
     // Scale the raw value into a piecewise linear equation
