@@ -37,9 +37,20 @@ public class Robot extends IterativeRobot {
 	private static Command _driveViaStickCommand;
 	private static Command _winchRaiseCommand;
 	
+	// really CommandGroups
+//	private Command _autoLeftSideSwitch;
+//	private Command _autoLeftSideScale;
+//	private Command _autoLeftSideLine;
+//	private Command _autoRightSideSwitch;
+//	private Command _autoRightSideScale;
+//	private Command _autoRightSideLine;
+//	private Command _autoCenterLeft;
+//	private Command _autoCenterRight;
+	
+	
 	public static OperatorInterface OperatorStation;
 
-    Command autonomousCommand;
+    private static Command _autoCommand;
     Command teleopCommand;
     SendableChooser chooser;
 
@@ -67,8 +78,9 @@ public class Robot extends IterativeRobot {
     	_testMotor = new TestMotor(_ioMap.PWM_Motor);
     	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
     								_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
-    								_ioMap.DIO_leftEncoder, _ioMap.DIO_rightEncoder);
-    	_winch = new Winch(_ioMap.PWM_winchMotor, _ioMap.DIO_limitSwitch);
+    								_ioMap.DIO_leftFrontEncoder, _ioMap.DIO_rightFrontEncoder,
+    								_ioMap.DIO_leftRearEncoder, _ioMap.DIO_rightRearEncoder);
+    	//_winch = new Winch(_ioMap.PWM_winchMotor, _ioMap.DIO_limitSwitch);
     	_rangeFinder = new RangeFinder(_ioMap.AIO_RangeFinder);
     	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
     	_accelerometer = new Accelerometer();
@@ -78,10 +90,9 @@ public class Robot extends IterativeRobot {
     private void CommandInit()
     {
     	_testCommand = new TestCommand(_switch);
-    	_winchRaiseCommand  = new WinchRaise(_winch);
+    //	_winchRaiseCommand  = new WinchRaise(_winch);
     	_driveToDistanceCommand = new DriveToDistance(_driveTrain, 0.1, 130.0);
-    	_driveViaStickCommand = new DriveViaStick(_driveTrain);
-    	
+    	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
     }
 	/**
      * This function is called once each time the robot enters Disabled mode.
@@ -106,8 +117,8 @@ public class Robot extends IterativeRobot {
 	 * or additional comparisons to the switch structure below with additional strings & commands.
 	 */
     public void autonomousInit() {
-        autonomousCommand = _testCommand;
-        GetAutoModeCommand();
+        _autoCommand =  GetAutoModeCommand();
+        System.out.printf("%s\n", _autoCommand.getName());
                 
 //        System.out.printf("%s %s\n", position, gameData);
         
@@ -123,8 +134,8 @@ public class Robot extends IterativeRobot {
 		} */
     	
     	// schedule the autonomous command (example)
-        if (autonomousCommand != null) 
-        	autonomousCommand.start();
+        if (_autoCommand != null) 
+        	_autoCommand.start();
     }
 
     /**
@@ -139,8 +150,8 @@ public class Robot extends IterativeRobot {
         // teleop starts running. If you want the autonomous to 
         // continue until interrupted by another command, remove
         // this line or comment it out.
-        if (autonomousCommand != null) 
-        	autonomousCommand.cancel();
+        if (_autoCommand != null) 
+        	_autoCommand.cancel();
         
         teleopCommand = _testCommand;
         teleopCommand.start();
@@ -160,52 +171,65 @@ public class Robot extends IterativeRobot {
         LiveWindow.run();
     }
     
-    private void GetAutoModeCommand()
+    private Command GetAutoModeCommand()
     {
     	String gameData;
         gameData = DriverStation.getInstance().getGameSpecificMessage();
         String position = SmartDashboard.getString("position", "C");
+        Command cmd = null;
+        
         switch (position)
         {
-        case "C":
+        case "C": 
         case "c":
         	if (gameData.charAt(0) == 'L')
-        		System.out.println("Center, left");
+        		cmd = new AutoCenterLeft(_driveTrain);
         	else
-        		System.out.println("Center, right");
+        		cmd = new AutoCenterRight(_driveTrain);
+        		
         	break;
-        	
+        	        	
         case "L":
         case "l":
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		System.out.println("switch straight clw");
+        		cmd = new AutoLeftSideSwitch(_driveTrain);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		System.out.println("switch straight clw");
-        	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		System.out.println("scale straight clw");
+        		cmd = new AutoLeftSideSwitch(_driveTrain);
+		    else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
+		    	cmd = new AutoLeftSideScale(_driveTrain);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		System.out.println("wait for teleop");
+        		cmd = new AutoToLine(_driveTrain);
         	else
+        	{	
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
+        		cmd = new AutoToLine(_driveTrain);
+        	}
         	break;
     	
         case "R": 
         case "r": 
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		System.out.println("wait for teleop");
+        		cmd = new AutoToLine(_driveTrain);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		System.out.println("scale straight cclw");
+        		cmd = new AutoRightSideScale(_driveTrain);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		System.out.println("switch straight cclw");
+        		cmd = new AutoRightSideSwitch(_driveTrain);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		System.out.println("switch straight cclw");
+        		cmd = new AutoRightSideSwitch(_driveTrain);
         	else
+        	{
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
+        		cmd = new AutoToLine(_driveTrain);
+    		}	
         	break;
         	
         	default:
+        	{
         		System.out.printf("unknown position %s \n", position);
+        		cmd = new AutoToLine(_driveTrain);
+        	}
         }
-
+        
+        return cmd;
     }
 }

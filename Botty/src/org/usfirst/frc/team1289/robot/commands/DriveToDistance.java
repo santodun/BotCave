@@ -33,9 +33,11 @@ public class DriveToDistance extends Command {
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-		double leftDistance = _driveTrain.GetLeftEncoderDistance();
-		double rightDistance = _driveTrain.GetRightEncoderDistance();
-		double averageDistance = Math.abs((leftDistance + rightDistance) / 2.0);
+		double leftFrontDistance = _driveTrain.GetLeftFrontEncoderDistance();
+		double rightFrontDistance = _driveTrain.GetRightFrontEncoderDistance();
+		double leftRearDistance = _driveTrain.GetLeftRearEncoderDistance();
+		double rightRearDistance = _driveTrain.GetRightRearEncoderDistance();
+		double averageDistance = Math.abs((leftFrontDistance + rightFrontDistance + leftRearDistance + rightRearDistance) / 4.0);
 		
 		if (averageDistance < _distance)
 			return false;

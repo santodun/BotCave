@@ -33,13 +33,16 @@ public class DriveTrain extends Subsystem
 	private static Talon _leftRearMotor;
 	private static Talon _rightRearMotor;
 	private static SpeedControllerGroup _leftMotors, _rightMotors;
-	private static Counter _leftEncoder;
-	private static Counter _rightEncoder; 
+	private static Counter _leftFrontEncoder;
+	private static Counter _rightFrontEncoder; 
+	private static Counter _leftRearEncoder;
+	private static Counter _rightRearEncoder; 
 	private static DifferentialDrive _robotDrive;
 	
 	public DriveTrain(int io_leftFront, int io_rightFront,
 						int io_leftRear, int io_rightRear,
-						int io_leftEncoder, int io_rightEncoder)
+						int io_leftFrontEncoder, int io_rightFrontEncoder,
+						int io_leftRearEncoder, int io_rightRearEncoder)
 	{
 		_leftFrontMotor = new Talon(io_leftFront);
 		_leftRearMotor = new Talon(io_leftRear);
@@ -60,15 +63,19 @@ public class DriveTrain extends Subsystem
 //        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
 //        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
         
-    	_leftEncoder = new Counter(io_leftEncoder);
-		_rightEncoder = new Counter(io_rightEncoder);
+    	_leftFrontEncoder = new Counter(io_leftFrontEncoder);
+		_rightFrontEncoder = new Counter(io_rightFrontEncoder);
+		_leftRearEncoder = new Counter(io_leftRearEncoder);
+		_rightRearEncoder = new Counter(io_rightRearEncoder);
 	
 		double wheelDiameter = 6.0;
 		double pulsesPerRotation = 6.0;
 		double pulseDistance = (wheelDiameter * Math.PI) / pulsesPerRotation; 
 				
-		_leftEncoder.setDistancePerPulse(pulseDistance);
-		_rightEncoder.setDistancePerPulse(pulseDistance);
+		_leftFrontEncoder.setDistancePerPulse(pulseDistance);
+		_rightFrontEncoder.setDistancePerPulse(pulseDistance);
+		_leftRearEncoder.setDistancePerPulse(pulseDistance);
+		_rightRearEncoder.setDistancePerPulse(pulseDistance);
 		
 	}
 	    
@@ -124,30 +131,54 @@ public class DriveTrain extends Subsystem
     	_robotDrive.stopMotor();
     }
     
-    public double GetLeftEncoderDistance()
+    public double GetLeftFrontEncoderDistance()
     {
-    	return _leftEncoder.getDistance();
+    	return _leftFrontEncoder.getDistance();
     }
     
-    public double GetRightEncoderDistance()
+    public double GetRightFrontEncoderDistance()
     {
-    	return _rightEncoder.getDistance();
+    	return _rightFrontEncoder.getDistance();
     }
     
-    public int GetRightEncoderCount()
+    public double GetLeftRearEncoderDistance()
     {
-    	return  _rightEncoder.get();
+    	return _leftRearEncoder.getDistance();
     }
     
-    public int GetLeftEncoderCount()
+    public double GetRightRearEncoderDistance()
     {
-    	return _leftEncoder.get();
+    	return _rightRearEncoder.getDistance();
     }
+    
+    
+    public int GetLeftFrontEncoderCount()
+    {
+    	return _leftFrontEncoder.get();
+    }
+    
+    public int GetRightFrontEncoderCount()
+    {
+    	return  _rightFrontEncoder.get();
+    }
+    
+    public int GetLeftRearEncoderCount()
+    {
+    	return _leftRearEncoder.get();
+    }
+    
+    public int GetRightRearEncoderCount()
+    {
+    	return  _rightRearEncoder.get();
+    }
+   
     
    public void ResetEncoders()
    {
-	   _leftEncoder.reset();
-	   _rightEncoder.reset();
+	   _leftFrontEncoder.reset();
+	   _rightFrontEncoder.reset();
+	   _leftRearEncoder.reset();
+	   _rightRearEncoder.reset();
    }
 }
 
