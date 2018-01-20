@@ -1,6 +1,6 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.subsystems.Switch;
+import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestCommand extends Command 
 {
-	private static Switch _switch;
+	private static RangeFinder _ranger;
 	private static Timer _timer;
 	private boolean _isDone = false;
 	
-	public TestCommand(Switch sw) 
+	public TestCommand(RangeFinder rf) 
     {
-		_switch = sw;
+		_ranger = rf;
 		_timer = new Timer();
     }
 
@@ -30,17 +30,8 @@ public class TestCommand extends Command
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	//System.out.print("RawBits\tVoltage\tAverageBits\tAverageVoltage\n");
-    	if (_timer.get() < 60.0)
-    	{
-    		if (_switch.Closed())
-    			System.out.printf("Closed\n");
-    		else
-    			System.out.printf("Open\n");
-    		
-    		_timer.delay(1.0);
-    	}	else
-    		_isDone = true;
+    	//System.out.println(_ranger.GetRangeInInches());
+    	
     }
 
     // Make this return true when this Command no longer needs to run execute()

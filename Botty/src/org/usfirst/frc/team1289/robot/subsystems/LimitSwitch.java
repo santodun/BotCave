@@ -3,11 +3,11 @@ package org.usfirst.frc.team1289.robot.subsystems;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 
-public class Switch extends Subsystem 
+public class LimitSwitch extends Subsystem 
 {
 	private static DigitalInput _switch;
 	
-	public Switch(int io_switch)
+	public LimitSwitch(int io_switch)
 	{
 		_switch = new DigitalInput(io_switch);
 	}

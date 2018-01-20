@@ -14,15 +14,21 @@ public class RangeFinder extends Subsystem
 		_rangeFinder.setOversampleBits(4);
 	}
 
-	public int GetRangeInMM()
+	public double GetRangeInMM()
 	{
-		return (int) Math.round(5 * _rangeFinder.getAverageVoltage()/(4.88/1000.0));
+		double slope = 1055.223;
+		double intercept = - 17.2288 ;
+		double volts = _rangeFinder.getAverageVoltage();
+		double range = slope * volts + intercept;
+		//double range = 5 * (volts/(4.88/1000.0)); // 17.02 mV
+		//System.out.printf("%f %f\n", volts, range);
+		return (int) Math.round(range); 
 	}
 
 	
 	public double GetRangeInInches()
 	{
-		int mm = GetRangeInMM();
+		double mm = GetRangeInMM();
 		return mm / 25.4; 
 	}
     public void initDefaultCommand() {

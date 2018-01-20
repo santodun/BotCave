@@ -9,16 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
  *
  */
-public class Winch extends Subsystem 
+public class SimpleMotor extends Subsystem 
 {
-	private static Talon _winchMotor;
-	private static DigitalInput _limitSwitch;
-	
-	public Winch(int io_motor, int io_limitswitch)
+	private static Talon _motor;
+		
+	public SimpleMotor(int io_motor)
 	{
-		_winchMotor = new Talon(io_motor);
-		_winchMotor.setInverted(true);
-		_limitSwitch = new DigitalInput(io_limitswitch);
+		_motor = new Talon(io_motor);
+		_motor.setInverted(true);
 	}
 
     // Put methods for controlling this subsystem
@@ -35,23 +33,17 @@ public class Winch extends Subsystem
     
     public void Raise() 
     {
-    	_winchMotor.set(1.0);
+    	_motor.set(1.0);
     }
     
     public void Lower() 
     {
-    	_winchMotor.set(-1.0);
+    	_motor.set(-1.0);
     }
     
     public void Stop()
     {
-    	_winchMotor.stopMotor();
-    }
-    
-    public boolean IsAtLimit()
-    {
-    	SmartDashboard.putBoolean("SwitchState", _limitSwitch.get());
-    	return ! _limitSwitch.get();
+    	_motor.stopMotor();
     }
 }
 

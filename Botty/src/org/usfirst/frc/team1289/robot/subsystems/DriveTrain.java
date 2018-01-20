@@ -14,12 +14,6 @@ import org.usfirst.frc.team1289.robot.commands.*;
 
 import edu.wpi.first.wpilibj.Counter;
 
-
-enum RotationalDirection 
-{
-	CLOCKWISE, COUNTERCLOCKWISE
-}
-
 /**
  *
  */
@@ -65,8 +59,8 @@ public class DriveTrain extends Subsystem
         
     	_leftFrontEncoder = new Counter(io_leftFrontEncoder);
 		_rightFrontEncoder = new Counter(io_rightFrontEncoder);
-		_leftRearEncoder = new Counter(io_leftRearEncoder);
-		_rightRearEncoder = new Counter(io_rightRearEncoder);
+//		_leftRearEncoder = new Counter(io_leftRearEncoder);
+//		_rightRearEncoder = new Counter(io_rightRearEncoder);
 	
 		double wheelDiameter = 6.0;
 		double pulsesPerRotation = 6.0;
@@ -74,8 +68,8 @@ public class DriveTrain extends Subsystem
 				
 		_leftFrontEncoder.setDistancePerPulse(pulseDistance);
 		_rightFrontEncoder.setDistancePerPulse(pulseDistance);
-		_leftRearEncoder.setDistancePerPulse(pulseDistance);
-		_rightRearEncoder.setDistancePerPulse(pulseDistance);
+//		_leftRearEncoder.setDistancePerPulse(pulseDistance);
+//		_rightRearEncoder.setDistancePerPulse(pulseDistance);
 		
 	}
 	    
@@ -91,15 +85,15 @@ public class DriveTrain extends Subsystem
     public void Move(double speed)
     {
     	boolean squareInputs = false; 
-    	_robotDrive.arcadeDrive(speed, 0.0, squareInputs);
+    	_robotDrive.arcadeDrive(-speed, 0.0, squareInputs);
     }
     
-    public void Rotate(RotationalDirection direction)
+    public void Rotate(RotationDirection direction)
     {
-    	if (direction == RotationalDirection.CLOCKWISE)
-    		_robotDrive.arcadeDrive(0.2, 0.3);
-    	else
+    	if (direction == RotationDirection.CLOCKWISE)
     		_robotDrive.arcadeDrive(-0.2, -0.3);
+    	else
+    		_robotDrive.arcadeDrive(0.2, 0.3);
     }
 
     // Scale the raw value into a piecewise linear equation
@@ -141,16 +135,16 @@ public class DriveTrain extends Subsystem
     	return _rightFrontEncoder.getDistance();
     }
     
-    public double GetLeftRearEncoderDistance()
-    {
-    	return _leftRearEncoder.getDistance();
-    }
-    
-    public double GetRightRearEncoderDistance()
-    {
-    	return _rightRearEncoder.getDistance();
-    }
-    
+//    public double GetLeftRearEncoderDistance()
+//    {
+//    	return _leftRearEncoder.getDistance();
+//    }
+//    
+//    public double GetRightRearEncoderDistance()
+//    {
+//    	return _rightRearEncoder.getDistance();
+//    }
+//    
     
     public int GetLeftFrontEncoderCount()
     {
@@ -162,23 +156,23 @@ public class DriveTrain extends Subsystem
     	return  _rightFrontEncoder.get();
     }
     
-    public int GetLeftRearEncoderCount()
-    {
-    	return _leftRearEncoder.get();
-    }
-    
-    public int GetRightRearEncoderCount()
-    {
-    	return  _rightRearEncoder.get();
-    }
-   
-    
+//    public int GetLeftRearEncoderCount()
+//    {
+//    	return _leftRearEncoder.get();
+//    }
+//    
+//    public int GetRightRearEncoderCount()
+//    {
+//    	return  _rightRearEncoder.get();
+//    }
+//   
+//    
    public void ResetEncoders()
    {
 	   _leftFrontEncoder.reset();
 	   _rightFrontEncoder.reset();
-	   _leftRearEncoder.reset();
-	   _rightRearEncoder.reset();
+//	   _leftRearEncoder.reset();
+//	   _rightRearEncoder.reset();
    }
 }
 

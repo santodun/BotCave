@@ -3,7 +3,6 @@ package org.usfirst.frc.team1289.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -23,35 +22,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 
 	private static RobotMap _ioMap = new RobotMap();
+	private static OperatingParameters _operatingParamters = new OperatingParameters();
 		
-	private static TestMotor _testMotor;
 	private static DriveTrain _driveTrain;
-	private static Winch _winch;
+	private static SimpleMotor _elevatorMotor;
 	private static RangeFinder _rangeFinder;
 	private static Gyroscope _gyro;
 	private static Accelerometer _accelerometer;
-	private static Switch _switch;
+	private static LimitSwitch _switch;
 	
 	private static Command _testCommand;
 	private static Command _driveToDistanceCommand;
 	private static Command _driveViaStickCommand;
-	private static Command _winchRaiseCommand;
-	
-	// really CommandGroups
-//	private Command _autoLeftSideSwitch;
-//	private Command _autoLeftSideScale;
-//	private Command _autoLeftSideLine;
-//	private Command _autoRightSideSwitch;
-//	private Command _autoRightSideScale;
-//	private Command _autoRightSideLine;
-//	private Command _autoCenterLeft;
-//	private Command _autoCenterRight;
-	
+	private static Command _elevatorCommand;
 	
 	public static OperatorInterface OperatorStation;
 
     private static Command _autoCommand;
-    Command teleopCommand;
+    Command _teleopCommand;
     SendableChooser chooser;
 
     /**
@@ -62,9 +50,9 @@ public class Robot extends IterativeRobot {
     	// Must happen in this order
     	SubsystemInit();
     	CommandInit();
-    	OperatorStation = new OperatorInterface(_winchRaiseCommand, _ioMap.IO_Joystick, _ioMap.IO_ButtonStation);
-    	
-    	SmartDashboard.putString("position", "C");
+    	OperatorStation = new OperatorInterface(_elevatorCommand, _ioMap.IO_Joystick, _ioMap.IO_ButtonStation);
+    	    	
+    	SmartDashboard.putString("position", "R");
     	
     	chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
@@ -75,22 +63,21 @@ public class Robot extends IterativeRobot {
 	
     private void SubsystemInit()
     {
-    	_testMotor = new TestMotor(_ioMap.PWM_Motor);
     	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
     								_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
     								_ioMap.DIO_leftFrontEncoder, _ioMap.DIO_rightFrontEncoder,
     								_ioMap.DIO_leftRearEncoder, _ioMap.DIO_rightRearEncoder);
-    	//_winch = new Winch(_ioMap.PWM_winchMotor, _ioMap.DIO_limitSwitch);
+    	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);
     	_rangeFinder = new RangeFinder(_ioMap.AIO_RangeFinder);
     	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
     	_accelerometer = new Accelerometer();
-    	_switch = new Switch(_ioMap.DIO_Switch);
+    	_switch = new LimitSwitch(_ioMap.DIO_Switch);
     }
     
     private void CommandInit()
     {
-    	_testCommand = new TestCommand(_switch);
-    //	_winchRaiseCommand  = new WinchRaise(_winch);
+    	_testCommand = new TestCommand(_rangeFinder);
+    	_elevatorCommand  = new ElevatorCommand(_elevatorMotor, _switch, ElevatorDirection.UP);
     	_driveToDistanceCommand = new DriveToDistance(_driveTrain, 0.1, 130.0);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
     }
@@ -153,8 +140,8 @@ public class Robot extends IterativeRobot {
         if (_autoCommand != null) 
         	_autoCommand.cancel();
         
-        teleopCommand = _testCommand;
-        teleopCommand.start();
+        _teleopCommand = _testCommand;
+        _teleopCommand.start();
     }
 
     /**
@@ -177,6 +164,9 @@ public class Robot extends IterativeRobot {
         gameData = DriverStation.getInstance().getGameSpecificMessage();
         String position = SmartDashboard.getString("position", "C");
         Command cmd = null;
+        double autoSpeed = _operatingParamters.AutoSpeed;
+        double autoSwitchDistance = _operatingParamters.AutoSwitchDistance;
+        double autoScaleDistance = _operatingParamters.AutoScaleDistance;
         
         switch (position)
         {
@@ -192,11 +182,17 @@ public class Robot extends IterativeRobot {
         case "L":
         case "l":
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		cmd = new AutoLeftSideSwitch(_driveTrain);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
+        				RotationDirection.CLOCKWISE, ElevatorDirection.UP,
+        				autoSpeed, autoSwitchDistance);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoLeftSideSwitch(_driveTrain);
-		    else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-		    	cmd = new AutoLeftSideScale(_driveTrain);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
+        				RotationDirection.CLOCKWISE, ElevatorDirection.UP,
+        				autoSpeed, autoSwitchDistance);
+        	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
+		    	cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
+        				RotationDirection.CLOCKWISE, ElevatorDirection.UP,
+        				autoSpeed, autoScaleDistance);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
         		cmd = new AutoToLine(_driveTrain);
         	else
@@ -211,11 +207,17 @@ public class Robot extends IterativeRobot {
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
         		cmd = new AutoToLine(_driveTrain);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoRightSideScale(_driveTrain);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
+        				RotationDirection.COUNTERCLOCKWISE, ElevatorDirection.UP,
+        				autoSpeed, autoScaleDistance);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoRightSideSwitch(_driveTrain);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder, 
+        				RotationDirection.COUNTERCLOCKWISE, ElevatorDirection.UP,
+        				autoSpeed, autoSwitchDistance);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		cmd = new AutoRightSideSwitch(_driveTrain);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
+        				RotationDirection.COUNTERCLOCKWISE, ElevatorDirection.UP,
+        				autoSpeed, autoSwitchDistance);
         	else
         	{
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
