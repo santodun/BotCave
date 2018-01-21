@@ -14,13 +14,13 @@ public class Rotate extends Command {
 	private Gyroscope _gyro;
 	private DriveTrain _driveTrain;
 	private RotationDirection _direction;
-	private int _degrees;
+	private int _targetDegrees;
 	
 	    public Rotate(DriveTrain dt, Gyroscope gyro, RotationDirection direction, int degrees) {
     	_gyro = gyro;
     	_driveTrain = dt;
     	_direction = direction;
-    	_degrees = degrees;
+    	_targetDegrees = degrees;
     }
 
     // Called just before this Command runs the first time
@@ -39,12 +39,19 @@ public class Rotate extends Command {
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
+    	boolean done = false;
+    	
     	double heading = _gyro.GetHeading();
     	System.out.printf("Heading %f\n", heading);
-    	if (heading < _degrees)
-    		return false;
+    	
+    	if (_direction == RotationDirection.CLOCKWISE)
+    		if (heading > _targetDegrees)
+    			done = true;
     	else
-    		return true;
+    		if (heading < _targetDegrees)
+    			done = true;
+    	
+    	return done;
     }
 
     // Called once after isFinished returns true

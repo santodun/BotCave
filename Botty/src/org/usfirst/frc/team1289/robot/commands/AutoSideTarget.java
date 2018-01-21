@@ -13,8 +13,14 @@ public class AutoSideTarget extends CommandGroup
 		Gyroscope gyro, RangeFinder ranger, RotationDirection rotateDirection, ElevatorDirection elevatorDirection,
 		double targetSpeed, double targetDistance) 
 	{
+		int degrees = 0;
+		if (rotateDirection == RotationDirection.CLOCKWISE)
+			degrees = 90;
+		else
+			degrees = -90;
+		
 		addSequential(new DriveAndLift(driveTrain, elevatorMotor, limitSwitch, elevatorDirection, targetSpeed, targetDistance));
-		addSequential(new Rotate(driveTrain, gyro, rotateDirection, 90));
+		addSequential(new Rotate(driveTrain, gyro, rotateDirection, degrees));
 		addSequential(new DriveUntilDistance(driveTrain, ranger, 15));
 
     }
