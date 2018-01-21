@@ -52,8 +52,7 @@ public class Robot extends IterativeRobot {
     	CommandInit();
     	OperatorStation = new OperatorInterface(_elevatorCommand, _ioMap.IO_Joystick, _ioMap.IO_ButtonStation);
     	    	
-    	SmartDashboard.putString("position", "R");
-    	
+    	   	
     	chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
@@ -164,9 +163,9 @@ public class Robot extends IterativeRobot {
         gameData = DriverStation.getInstance().getGameSpecificMessage();
         String position = SmartDashboard.getString("position", "C");
         Command cmd = null;
-        double autoSpeed = _operatingParamters.AutoSpeed;
-        double autoSwitchDistance = _operatingParamters.AutoSwitchDistance;
-        double autoScaleDistance = _operatingParamters.AutoScaleDistance;
+        double autoSpeed = _operatingParamters.AutoSpeed();
+        double autoSwitchDistance = _operatingParamters.SwitchDistance();
+        double autoScaleDistance = _operatingParamters.ScaleDistance();
         
         switch (position)
         {
