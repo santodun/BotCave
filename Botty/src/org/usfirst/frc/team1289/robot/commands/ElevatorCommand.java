@@ -1,6 +1,5 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.OperatorInterface;
 import org.usfirst.frc.team1289.robot.subsystems.SimpleMotor;
 import org.usfirst.frc.team1289.robot.subsystems.LimitSwitch;
 

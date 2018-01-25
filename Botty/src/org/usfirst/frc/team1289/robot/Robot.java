@@ -3,6 +3,8 @@ package org.usfirst.frc.team1289.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -11,6 +13,9 @@ import org.usfirst.frc.team1289.robot.commands.*;
 import org.usfirst.frc.team1289.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.*;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 
 	private static RobotMap _ioMap = new RobotMap();
-	private static OperatingParameters _operatingParamters = new OperatingParameters();
+	private static OperatingParameters _operatingParameters = new OperatingParameters();
 		
 	private static DriveTrain _driveTrain;
 	private static SimpleMotor _elevatorMotor;
@@ -32,11 +37,12 @@ public class Robot extends IterativeRobot {
 	private static LimitSwitch _switch;
 	
 	private static Command _testCommand;
-	private static Command _driveToDistanceCommand;
 	private static Command _driveViaStickCommand;
-	private static Command _elevatorCommand;
-	
-	public static OperatorInterface OperatorStation;
+
+	public static Joystick _joyStick;
+	public static Joystick _buttonStation;
+	public static Button _upButton;
+	public static Button _downButton;
 
     private static Command _autoCommand;
     Command _teleopCommand;
@@ -48,10 +54,30 @@ public class Robot extends IterativeRobot {
      */
     public void robotInit() {
     	// Must happen in this order
-    	SubsystemInit();
-    	CommandInit();
-    	OperatorStation = new OperatorInterface(_elevatorCommand, _ioMap.IO_Joystick, _ioMap.IO_ButtonStation);
-    	    	
+    	// Joysticks/Buttons, etc
+    	_joyStick = new Joystick(_ioMap.IO_Joystick);
+	    _buttonStation = new Joystick(_ioMap.IO_ButtonStation);
+	    _upButton = new JoystickButton(_buttonStation, _ioMap.IO_UpButton);
+	    _downButton = new JoystickButton(_buttonStation, _ioMap.IO_DownButton);
+	   
+    	// Subsystems
+    	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);
+    	_switch = new LimitSwitch(_ioMap.DIO_Switch);
+      	_rangeFinder = new RangeFinder(_ioMap.AIO_RangeFinder);
+    	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
+    	_accelerometer = new Accelerometer();
+    	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
+				_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
+				_ioMap.DIO_leftFrontEncoder, _ioMap.DIO_rightFrontEncoder,
+				_ioMap.DIO_leftRearEncoder, _ioMap.DIO_rightRearEncoder,
+				_joyStick, _operatingParameters);
+    	
+    	// Commands
+    	_testCommand = new TestCommand(_gyro);
+    	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
+    	
+        _upButton.whileHeld(new ElevatorCommand(_elevatorMotor, _switch, ElevatorDirection.UP));
+        _downButton.whileHeld(new ElevatorCommand(_elevatorMotor, _switch, ElevatorDirection.DOWN));
     	   	
     	chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
@@ -60,26 +86,7 @@ public class Robot extends IterativeRobot {
     	
     }
 	
-    private void SubsystemInit()
-    {
-    	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
-    								_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
-    								_ioMap.DIO_leftFrontEncoder, _ioMap.DIO_rightFrontEncoder,
-    								_ioMap.DIO_leftRearEncoder, _ioMap.DIO_rightRearEncoder);
-    	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);
-    	_rangeFinder = new RangeFinder(_ioMap.AIO_RangeFinder);
-    	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
-    	_accelerometer = new Accelerometer();
-    	_switch = new LimitSwitch(_ioMap.DIO_Switch);
-    }
-    
-    private void CommandInit()
-    {
-    	_testCommand = new TestCommand(_rangeFinder);
-    	_elevatorCommand  = new ElevatorCommand(_elevatorMotor, _switch, ElevatorDirection.UP);
-    	_driveToDistanceCommand = new DriveToDistance(_driveTrain, 0.1, 130.0);
-    	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
-    }
+  
 	/**
      * This function is called once each time the robot enters Disabled mode.
      * You can use it to reset any subsystem information you want to clear when
@@ -139,7 +146,7 @@ public class Robot extends IterativeRobot {
         if (_autoCommand != null) 
         	_autoCommand.cancel();
         
-        _teleopCommand = _testCommand;
+        _teleopCommand = _testCommand; //_driveViaStickCommand;
         _teleopCommand.start();
     }
 
@@ -161,11 +168,11 @@ public class Robot extends IterativeRobot {
     {
     	String gameData;
         gameData = DriverStation.getInstance().getGameSpecificMessage();
-        String position = SmartDashboard.getString("position", "C");
+        String position = _operatingParameters.StartingAlignment(); //SmartDashboard.getString("position", "C");
         Command cmd = null;
-        double autoSpeed = _operatingParamters.AutoSpeed();
-        double autoSwitchDistance = _operatingParamters.SwitchDistance();
-        double autoScaleDistance = _operatingParamters.ScaleDistance();
+        double autoSpeed = _operatingParameters.AutoSpeed();
+        double autoSwitchDistance = _operatingParameters.SwitchDistance();
+        double autoScaleDistance = _operatingParameters.ScaleDistance();
         
         switch (position)
         {

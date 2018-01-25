@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Joystick;
 
-import org.usfirst.frc.team1289.robot.OperatorInterface;
+//import org.usfirst.frc.team1289.robot.OperatorInterface;
 import org.usfirst.frc.team1289.robot.Robot;
+import org.usfirst.frc.team1289.robot.OperatingParameters;
 import org.usfirst.frc.team1289.robot.commands.*;
 
 import edu.wpi.first.wpilibj.Counter;
@@ -32,11 +34,14 @@ public class DriveTrain extends Subsystem
 	private static Counter _leftRearEncoder;
 	private static Counter _rightRearEncoder; 
 	private static DifferentialDrive _robotDrive;
+	private static Joystick _joystick;
+	private static OperatingParameters _parameters;
 	
 	public DriveTrain(int io_leftFront, int io_rightFront,
 						int io_leftRear, int io_rightRear,
 						int io_leftFrontEncoder, int io_rightFrontEncoder,
-						int io_leftRearEncoder, int io_rightRearEncoder)
+						int io_leftRearEncoder, int io_rightRearEncoder,
+						Joystick joystick, OperatingParameters parameters)
 	{
 		_leftFrontMotor = new Talon(io_leftFront);
 		_leftRearMotor = new Talon(io_leftRear);
@@ -52,11 +57,11 @@ public class DriveTrain extends Subsystem
 		_robotDrive.setExpiration(0.1);
 		_robotDrive.setMaxOutput(1.0);
 		
-//		_robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
-//        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
-//        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
-//        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
-        
+//		_leftFrontMotor.setInverted(true);
+//		_leftRearMotor.setInverted(true);
+//		_rightFrontMotor.setInverted(true);
+//		_rightRearMotor.setInverted(true);
+//		
     	_leftFrontEncoder = new Counter(io_leftFrontEncoder);
 		_rightFrontEncoder = new Counter(io_rightFrontEncoder);
 //		_leftRearEncoder = new Counter(io_leftRearEncoder);
@@ -71,6 +76,8 @@ public class DriveTrain extends Subsystem
 //		_leftRearEncoder.setDistancePerPulse(pulseDistance);
 //		_rightRearEncoder.setDistancePerPulse(pulseDistance);
 		
+		_joystick = joystick;
+		_parameters = parameters;
 	}
 	    
 	public void initDefaultCommand() 
@@ -85,22 +92,22 @@ public class DriveTrain extends Subsystem
     public void Move(double speed)
     {
     	boolean squareInputs = false; 
-    	_robotDrive.arcadeDrive(-speed, 0.0, squareInputs);
+    	_robotDrive.arcadeDrive(speed, 0.0, squareInputs);
     }
     
     public void Rotate(RotationDirection direction)
     {
     	if (direction == RotationDirection.CLOCKWISE)
-    		_robotDrive.arcadeDrive(-0.2, -0.3);
-    	else
     		_robotDrive.arcadeDrive(0.2, 0.3);
+    	else
+    		_robotDrive.arcadeDrive(-0.2, -0.3);
     }
 
     // Scale the raw value into a piecewise linear equation
     private double ScaleValue(double rawValue)
     {
 
-    	double deadBand = SmartDashboard.getNumber("Drivetrain Deadband", 0.05);
+    	double deadBand = _parameters.DriveTrainDeadBand();
     	if (-deadBand < rawValue && rawValue < deadBand)
     		return 0.0;
     	else
@@ -110,10 +117,9 @@ public class DriveTrain extends Subsystem
     
     public void ArcadeDrive()
     {
-    	/* Note the negatation */
-    	double moveValue = 0; // - Robot.DriverStation.joyStick.getY();
-    	double rotateValue = 0; //- Robot.DriverStation.joyStick.getX();
-    	
+    	double moveValue =  _joystick.getY();
+    	double rotateValue =  _joystick.getX();
+    	  	
     	moveValue = ScaleValue(moveValue);
     	rotateValue = ScaleValue(rotateValue);
     	

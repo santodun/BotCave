@@ -10,6 +10,7 @@ public class OperatingParameters
 	private String _scaleDistanceKey = "ScaleDistance";
 	private String _autoLineDistanceKey = "AutoLineDistance";
 	private String _startAlignmentKey = "StartAlignment";
+	private String _driveTrainDeadBandKey = "Drivetrain Deadband";
 	
 	
 	// Values
@@ -18,6 +19,7 @@ public class OperatingParameters
 	private double _scaleDistance = 250.0;
 	private double _autoLineDistance = 130.0;
 	private String _startAlignment = "R";
+	private double _driveTrainDeadBand = 0.05;
 	
 	public OperatingParameters()
 	{
@@ -26,6 +28,7 @@ public class OperatingParameters
 		SmartDashboard.putNumber(_switchDistanceKey, _switchDistance);
 		SmartDashboard.putNumber(_scaleDistanceKey, _scaleDistance);
 		SmartDashboard.putNumber(_autoLineDistanceKey, _autoLineDistance);
+		SmartDashboard.getNumber(_driveTrainDeadBandKey, _driveTrainDeadBand);
 	}
 	
 	public String StartingAlignment()
@@ -53,4 +56,8 @@ public class OperatingParameters
 		return SmartDashboard.getNumber(_autoLineDistanceKey, _autoLineDistance);
 	}
 
+	public double DriveTrainDeadBand()
+	{
+		return SmartDashboard.getNumber(_driveTrainDeadBandKey, _driveTrainDeadBand);
+	}
 }

@@ -1,6 +1,6 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
+import org.usfirst.frc.team1289.robot.subsystems.Gyroscope;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestCommand extends Command 
 {
-	private static RangeFinder _ranger;
+	private static Gyroscope _gyro;
 	private static Timer _timer;
 	private boolean _isDone = false;
 	
-	public TestCommand(RangeFinder rf) 
+	public TestCommand(Gyroscope gyro) 
     {
-		_ranger = rf;
+		_gyro = gyro;
 		_timer = new Timer();
     }
 
@@ -30,8 +30,7 @@ public class TestCommand extends Command
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	//System.out.println(_ranger.GetRangeInInches());
-    	
+    	System.out.println(_gyro.GetHeading());
     }
 
     // Make this return true when this Command no longer needs to run execute()

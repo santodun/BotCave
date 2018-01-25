@@ -12,12 +12,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class DriveViaStick extends Command 
 {
 	private static DriveTrain _driveTrain;
-
+	
     public DriveViaStick(DriveTrain drivetrain)
     {
     	_driveTrain = drivetrain;
-        // Use requires() here to declare subsystem dependencies
-  //      requires(Robot.drivetrain);
     }
 
     // Called just before this Command runs the first time
