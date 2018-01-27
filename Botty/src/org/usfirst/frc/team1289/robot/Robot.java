@@ -31,19 +31,24 @@ public class Robot extends IterativeRobot {
 		
 	private static DriveTrain _driveTrain;
 	private static SimpleMotor _elevatorMotor;
-	private static RangeFinder _rangeFinder;
+	private static RangeFinder _driveTrainRangeFinder;
+	private static RangeFinder _elevatorRangeFinder;
 	private static Gyroscope _gyro;
 	private static Accelerometer _accelerometer;
-	private static LimitSwitch _switch;
+	private static LimitSwitch _elevatorMaxBreaker;
+	private static LimitSwitch _elevatorMinBreaker;
 	
 	private static Command _testCommand;
 	private static Command _driveViaStickCommand;
 
 	public static Joystick _joyStick;
 	public static Joystick _buttonStation;
-	public static Button _upButton;
-	public static Button _downButton;
-
+	public static Button _rungButton;
+	public static Button _scaleButton;
+	public static Button _switchButton;
+	public static Button _portalButton;
+	public static Button _exchangeButton;
+	
     private static Command _autoCommand;
     Command _teleopCommand;
     SendableChooser chooser;
@@ -57,14 +62,20 @@ public class Robot extends IterativeRobot {
     	// Joysticks/Buttons, etc
     	_joyStick = new Joystick(_ioMap.IO_Joystick);
 	    _buttonStation = new Joystick(_ioMap.IO_ButtonStation);
-	    _upButton = new JoystickButton(_buttonStation, _ioMap.IO_UpButton);
-	    _downButton = new JoystickButton(_buttonStation, _ioMap.IO_DownButton);
+	    
+	    _rungButton = new JoystickButton(_buttonStation, _ioMap.IO_RungButton);
+	    _scaleButton = new JoystickButton(_buttonStation, _ioMap.IO_ScaleButton);
+	    _switchButton = new JoystickButton(_buttonStation, _ioMap.IO_SwitchButton);
+	    _portalButton = new JoystickButton(_buttonStation, _ioMap.IO_PortalButton);
+	    _exchangeButton = new JoystickButton(_buttonStation, _ioMap.IO_ExchangeButton);
 	   
     	// Subsystems
     	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);
-    	_switch = new LimitSwitch(_ioMap.DIO_Switch);
-      	_rangeFinder = new RangeFinder(_ioMap.AIO_RangeFinder);
-    	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
+    	_elevatorMaxBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMaxBreaker);
+    	_elevatorMinBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMinBreaker);
+      	_driveTrainRangeFinder = new RangeFinder(_ioMap.AIO_DriveTrainRangeFinder);
+      	_elevatorRangeFinder = new RangeFinder(_ioMap.AIO_ElevatorRangeFinder);
+      	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
     	_accelerometer = new Accelerometer();
     	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
 				_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
@@ -76,9 +87,17 @@ public class Robot extends IterativeRobot {
     	_testCommand = new TestCommand(_gyro);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
     	
-        _upButton.whileHeld(new ElevatorCommand(_elevatorMotor, _switch, ElevatorDirection.UP));
-        _downButton.whileHeld(new ElevatorCommand(_elevatorMotor, _switch, ElevatorDirection.DOWN));
-    	   	
+    	_rungButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.RUNG, _operatingParameters));
+    	_scaleButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _operatingParameters));
+    	_switchButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _operatingParameters));
+    	_portalButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.PORTAL, _operatingParameters));
+    	_exchangeButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.EXCHANGE, _operatingParameters));
+           	
     	chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
@@ -184,21 +203,29 @@ public class Robot extends IterativeRobot {
         		cmd = new AutoCenterRight(_driveTrain);
         		
         	break;
-        	        	
+        	
+//        	 AutoSideTarget(DriveTrain driveTrain, SimpleMotor elevatorMotor, RangeFinder elevatorRangeFinder, 
+//        				LimitSwitch minBreaker, LimitSwitch maxBreaker, ElevatorPosition elevatorPosition,  
+//        			Gyroscope gyro, RangeFinder driveTrainRangeFinder, RotationDirection rotateDirection, 
+//        			double targetSpeed, double targetDistance) 
+//        	        	
         case "L":
         case "l":
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
-        				RotationDirection.CLOCKWISE, ElevatorDirection.UP,
-        				autoSpeed, autoSwitchDistance);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
+        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
+        				_driveTrainRangeFinder,	RotationDirection.CLOCKWISE,
+        				autoSpeed, autoSwitchDistance, _operatingParameters);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
-        				RotationDirection.CLOCKWISE, ElevatorDirection.UP,
-        				autoSpeed, autoSwitchDistance);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
+        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
+        				_driveTrainRangeFinder,	RotationDirection.CLOCKWISE,
+        				autoSpeed, autoSwitchDistance, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-		    	cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
-        				RotationDirection.CLOCKWISE, ElevatorDirection.UP,
-        				autoSpeed, autoScaleDistance);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
+        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _gyro, 
+        				_driveTrainRangeFinder,	RotationDirection.CLOCKWISE,
+        				autoSpeed, autoScaleDistance, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
         		cmd = new AutoToLine(_driveTrain);
         	else
@@ -213,17 +240,20 @@ public class Robot extends IterativeRobot {
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
         		cmd = new AutoToLine(_driveTrain);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
-        				RotationDirection.COUNTERCLOCKWISE, ElevatorDirection.UP,
-        				autoSpeed, autoScaleDistance);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
+        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _gyro, 
+        				_driveTrainRangeFinder,	RotationDirection.COUNTERCLOCKWISE,
+        				autoSpeed, autoScaleDistance, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder, 
-        				RotationDirection.COUNTERCLOCKWISE, ElevatorDirection.UP,
-        				autoSpeed, autoSwitchDistance);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
+        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
+        				_driveTrainRangeFinder,	RotationDirection.COUNTERCLOCKWISE,
+        				autoSpeed, autoSwitchDistance, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _switch, _gyro, _rangeFinder,
-        				RotationDirection.COUNTERCLOCKWISE, ElevatorDirection.UP,
-        				autoSpeed, autoSwitchDistance);
+        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
+        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
+        				_driveTrainRangeFinder,	RotationDirection.COUNTERCLOCKWISE,
+        				autoSpeed, autoSwitchDistance, _operatingParameters);
         	else
         	{
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);

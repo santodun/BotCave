@@ -11,6 +11,11 @@ public class OperatingParameters
 	private String _autoLineDistanceKey = "AutoLineDistance";
 	private String _startAlignmentKey = "StartAlignment";
 	private String _driveTrainDeadBandKey = "Drivetrain Deadband";
+	private String _elevatorPositionRungKey = "Elevator Rung Height";
+	private String _elevatorPositionScaleKey = "Elevator Scale Height";
+	private String _elevatorPositionSwitchKey = "Elevator Switch Height";
+	private String _elevatorPositionPortalKey = "Elevator Portal Height";
+	private String _elevatorPositionExchangeKey = "Elevator Exchange Height";
 	
 	
 	// Values
@@ -20,6 +25,11 @@ public class OperatingParameters
 	private double _autoLineDistance = 130.0;
 	private String _startAlignment = "R";
 	private double _driveTrainDeadBand = 0.05;
+	private double _elevatorPositionRungHeight = 84.0;
+	private double _elevatorPositionScaleHeight = 72.0;
+	private double _elevatorPositionSwitchHeight = 20.0;
+	private double _elevatorPositionPortalHeight = 20.0;
+	private double _elevatorPositionExchangeHeight = 2.0;
 	
 	public OperatingParameters()
 	{
@@ -28,7 +38,12 @@ public class OperatingParameters
 		SmartDashboard.putNumber(_switchDistanceKey, _switchDistance);
 		SmartDashboard.putNumber(_scaleDistanceKey, _scaleDistance);
 		SmartDashboard.putNumber(_autoLineDistanceKey, _autoLineDistance);
-		SmartDashboard.getNumber(_driveTrainDeadBandKey, _driveTrainDeadBand);
+		SmartDashboard.putNumber(_driveTrainDeadBandKey, _driveTrainDeadBand);
+		SmartDashboard.putNumber(_elevatorPositionRungKey, _elevatorPositionRungHeight);
+		SmartDashboard.putNumber(_elevatorPositionScaleKey, _elevatorPositionScaleHeight);
+		SmartDashboard.putNumber(_elevatorPositionSwitchKey, _elevatorPositionSwitchHeight);
+		SmartDashboard.putNumber(_elevatorPositionPortalKey, _elevatorPositionPortalHeight);
+		SmartDashboard.putNumber(_elevatorPositionExchangeKey, _elevatorPositionExchangeHeight);
 	}
 	
 	public String StartingAlignment()
@@ -59,5 +74,30 @@ public class OperatingParameters
 	public double DriveTrainDeadBand()
 	{
 		return SmartDashboard.getNumber(_driveTrainDeadBandKey, _driveTrainDeadBand);
+	}
+	
+	public double RungHeight()
+	{
+		return SmartDashboard.getNumber(_elevatorPositionRungKey, _elevatorPositionRungHeight);
+	}
+	
+	public double ScaleHeight()
+	{
+		return SmartDashboard.getNumber(_elevatorPositionScaleKey, _elevatorPositionScaleHeight);
+	}
+	
+	public double SwitchHeight()
+	{
+		return SmartDashboard.getNumber(_elevatorPositionSwitchKey, _elevatorPositionSwitchHeight);
+	}
+	
+	public double PortalHeight()
+	{
+		return SmartDashboard.getNumber(_elevatorPositionPortalKey, _elevatorPositionPortalHeight);
+	}
+	
+	public double ExchangeHeight()
+	{
+		return SmartDashboard.getNumber(_elevatorPositionExchangeKey, _elevatorPositionExchangeHeight);
 	}
 }

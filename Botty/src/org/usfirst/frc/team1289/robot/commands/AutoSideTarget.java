@@ -2,6 +2,7 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import org.usfirst.frc.team1289.robot.subsystems.*;
+import org.usfirst.frc.team1289.robot.OperatingParameters;
 
 /**
  *
@@ -9,9 +10,10 @@ import org.usfirst.frc.team1289.robot.subsystems.*;
 public class AutoSideTarget extends CommandGroup
 {
 
-	public AutoSideTarget(DriveTrain driveTrain, SimpleMotor elevatorMotor, LimitSwitch limitSwitch, 
-		Gyroscope gyro, RangeFinder ranger, RotationDirection rotateDirection, ElevatorDirection elevatorDirection,
-		double targetSpeed, double targetDistance) 
+	public AutoSideTarget(DriveTrain driveTrain, SimpleMotor elevatorMotor, RangeFinder elevatorRangeFinder, 
+			LimitSwitch minBreaker, LimitSwitch maxBreaker, ElevatorPosition elevatorPosition,  
+		Gyroscope gyro, RangeFinder driveTrainRangeFinder, RotationDirection rotateDirection,
+		double targetSpeed, double targetDistance, OperatingParameters operatingParameters) 
 	{
 		int degrees = 0;
 		if (rotateDirection == RotationDirection.CLOCKWISE)
@@ -19,9 +21,10 @@ public class AutoSideTarget extends CommandGroup
 		else
 			degrees = -90;
 		
-		addSequential(new DriveAndLift(driveTrain, elevatorMotor, limitSwitch, elevatorDirection, targetSpeed, targetDistance));
+		addSequential(new DriveAndLift(driveTrain, elevatorMotor, elevatorRangeFinder, 
+				minBreaker, maxBreaker, elevatorPosition, targetSpeed, targetDistance, operatingParameters));
 		addSequential(new Rotate(driveTrain, gyro, rotateDirection, degrees));
-		addSequential(new DriveUntilDistance(driveTrain, ranger, 15));
+		addSequential(new DriveUntilDistance(driveTrain, driveTrainRangeFinder, 15));
 
     }
 }

@@ -2,6 +2,8 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import org.usfirst.frc.team1289.robot.subsystems.SimpleMotor;
 import org.usfirst.frc.team1289.robot.subsystems.LimitSwitch;
+import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
+import org.usfirst.frc.team1289.robot.OperatingParameters;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -13,15 +15,27 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class ElevatorCommand extends Command 
 {
-	private static LimitSwitch _limitSwitch;
+	private static LimitSwitch _maxBreaker;
+	private static LimitSwitch _minBreaker;
 	private static SimpleMotor _motor;
+	private static ElevatorPosition _targetPosition;
+	private static RangeFinder _rangeFinder;
+	private static OperatingParameters _operatingParameters;
+	private double _currentHeight= 0;
+	private double _targetHeight = 0;
 	private ElevatorDirection _direction;
 
-    public ElevatorCommand(SimpleMotor motor, LimitSwitch sw, ElevatorDirection direction) 
+    public ElevatorCommand(SimpleMotor motor, RangeFinder rangeFinder, 
+    		LimitSwitch minBreaker, LimitSwitch maxBreaker, 
+    		ElevatorPosition targetPosition, OperatingParameters operatingParameters) 
     {
     	_motor = motor;
-    	_direction = direction;
-    	_limitSwitch = sw;
+    	_targetPosition = targetPosition;
+    	_minBreaker = minBreaker;
+    	_maxBreaker = maxBreaker;
+    	_rangeFinder = rangeFinder;
+    	_operatingParameters = operatingParameters;
+    	
     }
 
     // Called just before this Command runs the first time
@@ -29,33 +43,73 @@ public class ElevatorCommand extends Command
     {
     	_motor.Stop();
     	_motor.Reset();
+    	_currentHeight = _rangeFinder.GetRangeInInches();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	if (_direction == ElevatorDirection.UP)
+    	double targetHeight = 0;
+    	
+    	switch (_targetPosition)
+    	{
+    	case RUNG:
+    	{
+    		_targetHeight = _operatingParameters.RungHeight();
+    		break;
+    	}
+    	case SCALE:
+    	{
+    		_targetHeight = _operatingParameters.ScaleHeight();
+    		break;
+    	}
+    	case SWITCH:
+    	{
+    		_targetHeight = _operatingParameters.SwitchHeight();
+    		break;
+    	}
+    	case PORTAL:
+    	{
+    		_targetHeight = _operatingParameters.PortalHeight();
+    		break;
+    	}
+    	case EXCHANGE:
+    	{
+    		_targetHeight = _operatingParameters.ExchangeHeight();
+    		break;
+    	}
+    	}
+    	
+    	if (_currentHeight < targetHeight)
+    	{
     		_motor.Raise();
-    	else 
+    		_direction = ElevatorDirection.UP;
+    	}
+    	else
+    	{
     		_motor.Lower();
+    		_direction = ElevatorDirection.DOWN;
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-    	boolean rtn;
-    	if (_limitSwitch.Closed())
+    	if (_maxBreaker.Closed() || _minBreaker.Closed())
+    		return true;
+    	else
     	{
-    		rtn = true;
-    	//	System.out.printf("Switch is closed\n");
+    		double height = _rangeFinder.GetRangeInInches();
+    		if (_direction == ElevatorDirection.UP)
+    			if (height > _targetHeight)
+    				return true;
+    		else // direction is down
+    			if (height < _targetHeight)
+    				return true;
+    				
+    		return false;
     	}
-    	else 
-    	{
-    		//System.out.printf("open, direction: %s\n", _direction);
-    		rtn = false;
-    	}
-    	
-    	return rtn;
+    
     }
 
     // Called once after isFinished returns true

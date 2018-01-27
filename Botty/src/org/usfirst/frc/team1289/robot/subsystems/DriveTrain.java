@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Joystick;
 
-//import org.usfirst.frc.team1289.robot.OperatorInterface;
 import org.usfirst.frc.team1289.robot.Robot;
 import org.usfirst.frc.team1289.robot.OperatingParameters;
 import org.usfirst.frc.team1289.robot.commands.*;
