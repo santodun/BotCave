@@ -30,13 +30,13 @@ public class Robot extends IterativeRobot {
 	private static OperatingParameters _operatingParameters = new OperatingParameters();
 		
 	private static DriveTrain _driveTrain;
-	private static SimpleMotor _elevatorMotor;
+	private static SimpleMotor _elevatorMotor;	
 	private static RangeFinder _driveTrainRangeFinder;
-	private static RangeFinder _elevatorRangeFinder;
+	private static RangeFinder _elevatorRangeFinder;		
 	private static Gyroscope _gyro;
 	private static Accelerometer _accelerometer;
-	private static LimitSwitch _elevatorMaxBreaker;
-	private static LimitSwitch _elevatorMinBreaker;
+	private static LimitSwitch _elevatorMaxBreaker;				
+	private static LimitSwitch _elevatorMinBreaker;		
 	
 	private static Command _testCommand;
 	private static Command _driveViaStickCommand;
@@ -70,9 +70,9 @@ public class Robot extends IterativeRobot {
 	    _exchangeButton = new JoystickButton(_buttonStation, _ioMap.IO_ExchangeButton);
 	   
     	// Subsystems
-    	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);
-    	_elevatorMaxBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMaxBreaker);
-    	_elevatorMinBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMinBreaker);
+    	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);				
+    	_elevatorMaxBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMaxBreaker);		
+    	_elevatorMinBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMinBreaker);			
       	_driveTrainRangeFinder = new RangeFinder(_ioMap.AIO_DriveTrainRangeFinder);
       	_elevatorRangeFinder = new RangeFinder(_ioMap.AIO_ElevatorRangeFinder);
       	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
@@ -87,8 +87,11 @@ public class Robot extends IterativeRobot {
     	_testCommand = new TestCommand(_gyro);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
     	
-    	_rungButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
-    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.RUNG, _operatingParameters));
+	
+    	
+    	_rungButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, _elevatorMinBreaker, 
+    			_elevatorMaxBreaker, ElevatorPosition.RUNG, _operatingParameters));
+    	
     	_scaleButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
     			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _operatingParameters));
     	_switchButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
@@ -165,8 +168,9 @@ public class Robot extends IterativeRobot {
         if (_autoCommand != null) 
         	_autoCommand.cancel();
         
-        _teleopCommand = _testCommand; //_driveViaStickCommand;
+        _teleopCommand = _driveViaStickCommand;
         _teleopCommand.start();
+
     }
 
     /**

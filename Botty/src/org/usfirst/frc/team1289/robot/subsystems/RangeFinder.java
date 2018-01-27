@@ -21,7 +21,7 @@ public class RangeFinder extends Subsystem
 		double volts = _rangeFinder.getAverageVoltage();
 		double range = slope * volts + intercept;
 		//double range = 5 * (volts/(4.88/1000.0)); // 17.02 mV
-		//System.out.printf("%f %f\n", volts, range);
+		System.out.printf("%f %f\n", volts, range);
 		return (int) Math.round(range); 
 	}
 

@@ -18,7 +18,7 @@ public class ElevatorCommand extends Command
 	private static LimitSwitch _maxBreaker;
 	private static LimitSwitch _minBreaker;
 	private static SimpleMotor _motor;
-	private static ElevatorPosition _targetPosition;
+	private static ElevatorPosition _elevatorPosition;
 	private static RangeFinder _rangeFinder;
 	private static OperatingParameters _operatingParameters;
 	private double _currentHeight= 0;
@@ -27,10 +27,11 @@ public class ElevatorCommand extends Command
 
     public ElevatorCommand(SimpleMotor motor, RangeFinder rangeFinder, 
     		LimitSwitch minBreaker, LimitSwitch maxBreaker, 
-    		ElevatorPosition targetPosition, OperatingParameters operatingParameters) 
+    		ElevatorPosition elevatorPosition, OperatingParameters operatingParameters) 
+      
     {
     	_motor = motor;
-    	_targetPosition = targetPosition;
+    	_elevatorPosition = elevatorPosition;
     	_minBreaker = minBreaker;
     	_maxBreaker = maxBreaker;
     	_rangeFinder = rangeFinder;
@@ -51,7 +52,7 @@ public class ElevatorCommand extends Command
     {
     	double targetHeight = 0;
     	
-    	switch (_targetPosition)
+    	switch (_elevatorPosition)
     	{
     	case RUNG:
     	{
