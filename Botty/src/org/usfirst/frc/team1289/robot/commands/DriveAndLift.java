@@ -20,7 +20,7 @@ public class DriveAndLift extends CommandGroup
 			double targetSpeed, double targetDistance, OperatingParameters operatingParameters) 
     {
     	addParallel(new DriveToDistance(driveTrain, targetSpeed, targetDistance));
-		addParallel(new ElevatorCommand(elevatorMotor, rangeFinder, 
+		addParallel(new ElevatorAutoCommand(elevatorMotor, rangeFinder, 
     			minBreaker, maxBreaker, targetPosition, operatingParameters));
     }
 }

@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.command.Command;
 /**
  *
  */
-public class ElevatorCommand extends Command 
+public class ElevatorAutoCommand extends Command 
 {
 	private static LimitSwitch _maxBreaker;
 	private static LimitSwitch _minBreaker;
@@ -25,7 +25,7 @@ public class ElevatorCommand extends Command
 	private double _targetHeight = 0;
 	private ElevatorDirection _direction;
 
-    public ElevatorCommand(SimpleMotor motor, RangeFinder rangeFinder, 
+    public ElevatorAutoCommand(SimpleMotor motor, RangeFinder rangeFinder, 
     		LimitSwitch minBreaker, LimitSwitch maxBreaker, 
     		ElevatorPosition elevatorPosition, OperatingParameters operatingParameters) 
       

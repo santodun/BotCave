@@ -30,6 +30,9 @@ public class Robot extends IterativeRobot {
 	private static OperatingParameters _operatingParameters = new OperatingParameters();
 		
 	private static DriveTrain _driveTrain;
+	private static Grabber _grabber;
+	private static Elevator _elevator;
+	
 	private static SimpleMotor _elevatorMotor;	
 	private static RangeFinder _driveTrainRangeFinder;
 	private static RangeFinder _elevatorRangeFinder;		
@@ -40,14 +43,18 @@ public class Robot extends IterativeRobot {
 	
 	private static Command _testCommand;
 	private static Command _driveViaStickCommand;
+	private static Command _elevateViaStickCommand;
 
-	public static Joystick _joyStick;
+	public static Joystick _driveJoyStick;
+	public static Joystick _elevatorJoyStick;
 	public static Joystick _buttonStation;
 	public static Button _rungButton;
 	public static Button _scaleButton;
 	public static Button _switchButton;
 	public static Button _portalButton;
 	public static Button _exchangeButton;
+	public static Button _grabberOpenButton;
+	public static Button _grabberCloseButton;
 	
     private static Command _autoCommand;
     Command _teleopCommand;
@@ -60,7 +67,8 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
     	// Must happen in this order
     	// Joysticks/Buttons, etc
-    	_joyStick = new Joystick(_ioMap.IO_Joystick);
+    	_driveJoyStick = new Joystick(_ioMap.IO_DriveJoystick);
+    	_elevatorJoyStick = new Joystick(_ioMap.IO_ElevatorJoystick);
 	    _buttonStation = new Joystick(_ioMap.IO_ButtonStation);
 	    
 	    _rungButton = new JoystickButton(_buttonStation, _ioMap.IO_RungButton);
@@ -68,39 +76,48 @@ public class Robot extends IterativeRobot {
 	    _switchButton = new JoystickButton(_buttonStation, _ioMap.IO_SwitchButton);
 	    _portalButton = new JoystickButton(_buttonStation, _ioMap.IO_PortalButton);
 	    _exchangeButton = new JoystickButton(_buttonStation, _ioMap.IO_ExchangeButton);
-	   
+	    _grabberOpenButton = new JoystickButton(_buttonStation, _ioMap.IO_GrabberOpenButton);
+	    _grabberCloseButton = new JoystickButton(_buttonStation, _ioMap.IO_GrabberCloseButton);
+	    
     	// Subsystems
     	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);				
     	_elevatorMaxBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMaxBreaker);		
     	_elevatorMinBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMinBreaker);			
       	_driveTrainRangeFinder = new RangeFinder(_ioMap.AIO_DriveTrainRangeFinder);
-      	_elevatorRangeFinder = new RangeFinder(_ioMap.AIO_ElevatorRangeFinder);
+      	//_elevatorRangeFinder = new RangeFinder(_ioMap.AIO_ElevatorRangeFinder);
       	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
     	_accelerometer = new Accelerometer();
     	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
 				_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
 				_ioMap.DIO_leftFrontEncoder, _ioMap.DIO_rightFrontEncoder,
 				_ioMap.DIO_leftRearEncoder, _ioMap.DIO_rightRearEncoder,
-				_joyStick, _operatingParameters);
+				_driveJoyStick, _operatingParameters);
+    	_elevator = new Elevator(_elevatorMotor, _elevatorMaxBreaker, _elevatorMinBreaker);
+    	
+    	_grabber = new Grabber(_ioMap.PWM_grabberOpenCloseMotor, _ioMap.PWM_grabberLeftGrabEjectMotor, _ioMap.PWM_grabberRightGrabEjectMotor);
     	
     	// Commands
     	_testCommand = new TestCommand(_gyro);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
+    	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick);
     	
-	
+	/*
     	
-    	_rungButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, _elevatorMinBreaker, 
+    	_rungButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, _elevatorMinBreaker, 
     			_elevatorMaxBreaker, ElevatorPosition.RUNG, _operatingParameters));
     	
-    	_scaleButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    	_scaleButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
     			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _operatingParameters));
-    	_switchButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    	_switchButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
     			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _operatingParameters));
-    	_portalButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    	_portalButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
     			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.PORTAL, _operatingParameters));
-    	_exchangeButton.whenPressed(new ElevatorCommand(_elevatorMotor, _elevatorRangeFinder, 
+    	_exchangeButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
     			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.EXCHANGE, _operatingParameters));
-           	
+    	
+    	_grabberOpenButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.OPEN));
+    	_grabberCloseButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.CLOSE));
+      */     	
     	chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
@@ -168,7 +185,8 @@ public class Robot extends IterativeRobot {
         if (_autoCommand != null) 
         	_autoCommand.cancel();
         
-        _teleopCommand = _driveViaStickCommand;
+        _teleopCommand = new TeleOpCommand(_elevateViaStickCommand, _driveViaStickCommand);
+        System.out.println(_teleopCommand.getName());
         _teleopCommand.start();
 
     }
@@ -189,6 +207,8 @@ public class Robot extends IterativeRobot {
     
     private Command GetAutoModeCommand()
     {
+    	return null;
+    	/*
     	String gameData;
         gameData = DriverStation.getInstance().getGameSpecificMessage();
         String position = _operatingParameters.StartingAlignment(); //SmartDashboard.getString("position", "C");
@@ -273,5 +293,6 @@ public class Robot extends IterativeRobot {
         }
         
         return cmd;
+        */
     }
 }

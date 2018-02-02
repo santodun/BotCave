@@ -11,12 +11,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class SimpleMotor extends Subsystem 
 {
-	private static Talon _motor;
+	private Talon _motor;
 		
 	public SimpleMotor(int io_motor)
 	{
 		_motor = new Talon(io_motor);
 		_motor.setInverted(true);
+		
+		_motor.setSafetyEnabled(false);
+		_motor.setExpiration(0.1);
+		//_motor.setMaxOutput(1.0);
 	}
 
     // Put methods for controlling this subsystem
@@ -39,6 +43,11 @@ public class SimpleMotor extends Subsystem
     public void Lower() 
     {
     	_motor.set(-1.0);
+    }
+    
+    public void Move(double speed)
+    {
+    	_motor.set(speed);
     }
     
     public void Stop()

@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class LimitSwitch extends Subsystem 
 {
-	private static DigitalInput _switch;
+	private DigitalInput _switch;
 	
 	public LimitSwitch(int io_switch)
 	{
@@ -14,7 +14,7 @@ public class LimitSwitch extends Subsystem
 
 	public boolean Closed()
 	{
-		return _switch.get();
+		return ! _switch.get();
 	}
 	
 	public void initDefaultCommand() {
