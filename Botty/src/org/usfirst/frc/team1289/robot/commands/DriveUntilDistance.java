@@ -7,16 +7,16 @@ import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveUntilDistance extends Command {
-	private double _speed = -0.2;
-	private double _distance;
+	private double _speed = 0.2;
+	private double _targetDistance;
 	private DriveTrain _driveTrain;
-	private RangeFinder _ranger;
-
-    public DriveUntilDistance(DriveTrain drivetrain, RangeFinder ranger, double distance)
+	private boolean _isDone = false;
+			
+	public DriveUntilDistance(DriveTrain drivetrain, double distance)
     {
-    	_distance = distance;
+    	_targetDistance = distance;
     	_driveTrain = drivetrain;
-    	_ranger = ranger;
+    	_driveTrain.Reset();
     }
     
     // Called just before this Command runs the first time
@@ -30,17 +30,20 @@ public class DriveUntilDistance extends Command {
     protected void execute() 
     {
     	_driveTrain.Move(_speed);
+    	
+    	double range = _driveTrain.RangeToTargetInInches();
+    	   	
+    	//System.out.printf("%f, %f\n", range, _targetDistance);
+    	if (range< _targetDistance)
+    		_isDone = true;
     }
-
+    
+    
+  
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-    	double range = _ranger.GetRangeInInches();
-    	System.out.printf("%f, %f\n", range, _distance);
-		if (range > _distance)
-			return false;
-		else
-			return true;
+    	return _isDone;
     }
 
     // Called once after isFinished returns true

@@ -8,9 +8,10 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
  */
 public class TeleOpCommand extends CommandGroup {
 
-    public TeleOpCommand(Command elevator, Command driveTrain) 
+    public TeleOpCommand(Command elevator, Command driveTrain, Command grabber) 
     {
         addParallel(elevator);
         addParallel(driveTrain);
+       // addParallel(grabber);
     }
 }

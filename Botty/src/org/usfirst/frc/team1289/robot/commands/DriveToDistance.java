@@ -20,8 +20,7 @@ public class DriveToDistance extends Command {
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    	_driveTrain.Stop();
-    	_driveTrain.ResetEncoders();
+    	_driveTrain.Reset();
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -35,10 +34,9 @@ public class DriveToDistance extends Command {
     {
 		double leftFrontDistance = _driveTrain.GetLeftFrontEncoderDistance();
 		double rightFrontDistance = _driveTrain.GetRightFrontEncoderDistance();
-//		double leftRearDistance = _driveTrain.GetLeftRearEncoderDistance();
-//		double rightRearDistance = _driveTrain.GetRightRearEncoderDistance();
-		double averageDistance = Math.abs((leftFrontDistance + rightFrontDistance /*+ leftRearDistance + rightRearDistance*/) / 2.0 /*4.0*/);
-		
+		double averageDistance = Math.abs((leftFrontDistance + rightFrontDistance) / 2.0 );
+		System.out.printf("%f %f %f\n", leftFrontDistance, rightFrontDistance, averageDistance);
+		//System.out.printf("%d, %f\n", _driveTrain.GetLeftFrontEncoderCount(), averageDistance);
 		if (averageDistance < _distance)
 			return false;
 		else
@@ -48,8 +46,7 @@ public class DriveToDistance extends Command {
     // Called once after isFinished returns true
     protected void end() 
     {
-      	_driveTrain.Stop();
-    	_driveTrain.ResetEncoders();
+    	_driveTrain.Reset();
     }
 
     // Called when another command which requires one or more of the same

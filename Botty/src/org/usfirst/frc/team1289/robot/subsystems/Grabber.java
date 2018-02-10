@@ -1,61 +1,62 @@
 package org.usfirst.frc.team1289.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
-//import edu.wpi.first.wpilibj.Talon;
-
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.DigitalInput;
 /**
  *
  */
 
-public class Grabber extends Subsystem {
-
-    // Put methods for controlling this subsystem
-    // here. Call these from Commands.
-	static SimpleMotor _openCloseMotor;
-	static SimpleMotor _leftGrabberMotor;
-	static SimpleMotor _rightGrabberMotor;
+public class Grabber extends Subsystem
+{
+	private static SpeedController _openCloseMotor;
+	private static DigitalInput _leftBreaker;
+	private static DigitalInput _rightBreaker;
+	private static boolean _grabberIsClosed = true;
 		
-	public Grabber(int io_openClose, int io_leftGrabber, int io_rightGrabber)
+	public Grabber(SpeedController openCloseMotor, DigitalInput leftBreaker, DigitalInput rightBreaker)
 	{
-		_openCloseMotor  = new SimpleMotor(io_openClose);
-		_leftGrabberMotor = new SimpleMotor(io_leftGrabber);
-		_rightGrabberMotor = new SimpleMotor(io_rightGrabber);
-		
+		_openCloseMotor  = openCloseMotor;
+		_leftBreaker = leftBreaker;
+		_rightBreaker = rightBreaker;_leftBreaker = leftBreaker;
+
 		StopAllMotors();
 	}
+	
+	public boolean IsLeftBreakerClosed()
+	{
+		return ! _leftBreaker.get();
+	}
 
+	public boolean IsRightBreakerClosed()
+	{
+		return ! _rightBreaker.get();
+	}
+	
 	public void StopAllMotors()
 	{
-		_openCloseMotor.Stop();
-		_leftGrabberMotor.Stop();
-		_rightGrabberMotor.Stop();
+		_openCloseMotor.stopMotor();
 	}
 	
 	public void ActuateGrabber()
 	{
-		_openCloseMotor.Stop();
-		_openCloseMotor.Raise();
+		if (_grabberIsClosed)
+		{
+			// open
+			_openCloseMotor.set(0.3);
+			_grabberIsClosed = false;
+		}
+		else
+		{
+			// closed
+			_openCloseMotor.set(-0.3);
+			_grabberIsClosed = true;
+		}
 	}
 		
 	public void StopOpenCloseActuation()
 	{
-		_openCloseMotor.Stop();
-	}
-	
-	public void Eject()
-	{
-		_leftGrabberMotor.Stop();
-		_rightGrabberMotor.Stop();
-		_leftGrabberMotor.Raise();
-		_rightGrabberMotor.Lower();
-	}
-	
-	public void Grab()
-	{
-		_leftGrabberMotor.Stop();
-		_rightGrabberMotor.Stop();
-		_leftGrabberMotor.Lower();
-		_rightGrabberMotor.Raise();
+		_openCloseMotor.stopMotor();
 	}
 	
 	

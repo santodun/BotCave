@@ -10,14 +10,13 @@ import org.usfirst.frc.team1289.robot.subsystems.Gyroscope;
 /**
  *
  */
-public class Rotate extends Command {
-	private Gyroscope _gyro;
+public class Rotate extends Command 
+{
 	private DriveTrain _driveTrain;
 	private RotationDirection _direction;
 	private int _targetDegrees;
 	
-	    public Rotate(DriveTrain dt, Gyroscope gyro, RotationDirection direction, int degrees) {
-    	_gyro = gyro;
+	    public Rotate(DriveTrain dt, RotationDirection direction, int degrees) {
     	_driveTrain = dt;
     	_direction = direction;
     	_targetDegrees = degrees;
@@ -26,8 +25,7 @@ public class Rotate extends Command {
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    	_driveTrain.Stop();
-    	_gyro.Reset();
+    	_driveTrain.Reset();
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -41,15 +39,19 @@ public class Rotate extends Command {
     {
     	boolean done = false;
     	
-    	double heading = _gyro.GetHeading();
-    	System.out.printf("Heading %f\n", heading);
-    	
+    	double heading = _driveTrain.GetHeading();
+    	//System.out.printf("Heading %f target %d\n", heading, _targetDegrees);
+    	//System.out.println(_direction.ordinal());
     	if (_direction == RotationDirection.CLOCKWISE)
-    		if (heading > _targetDegrees)
+    	{
+    		if (heading > (double) _targetDegrees)
     			done = true;
+    	}
     	else
-    		if (heading < _targetDegrees)
+    	{
+    		if (heading < (double) _targetDegrees)
     			done = true;
+    	}
     	
     	return done;
     }

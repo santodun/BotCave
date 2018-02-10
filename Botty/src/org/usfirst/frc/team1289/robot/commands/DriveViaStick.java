@@ -21,14 +21,13 @@ public class DriveViaStick extends Command
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    	_driveTrain.Stop();
-    	_driveTrain.ResetEncoders();
+    	_driveTrain.Reset();
 	}
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	_driveTrain.ArcadeDrive();
+    	_driveTrain.StickDrive();
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -40,8 +39,7 @@ public class DriveViaStick extends Command
     // Called once after isFinished returns true
     protected void end() 
     {
-    	_driveTrain.Stop();
-    	_driveTrain.ResetEncoders();
+    	_driveTrain.Reset();
     }
 
     // Called when another command which requires one or more of the same

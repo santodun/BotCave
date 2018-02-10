@@ -27,13 +27,7 @@ public class ElevateViaStick extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	double speed = _stick.getY();
-    	
-    	if (speed > -0.1 && speed < 0.1)
-    	{
-    		_elevator.Stop();
-    		return;
-    	}
+    	double speed = -_stick.getY();
     	
     	if (_elevator.IsAtMax() && speed > 0)
     	{

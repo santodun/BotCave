@@ -15,6 +15,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
+import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogGyro;
 
 
 /**
@@ -33,31 +37,36 @@ public class Robot extends IterativeRobot {
 	private static Grabber _grabber;
 	private static Elevator _elevator;
 	
-	private static SimpleMotor _elevatorMotor;	
-	private static RangeFinder _driveTrainRangeFinder;
-	private static RangeFinder _elevatorRangeFinder;		
-	private static Gyroscope _gyro;
-	private static Accelerometer _accelerometer;
-	private static LimitSwitch _elevatorMaxBreaker;				
-	private static LimitSwitch _elevatorMinBreaker;		
+	private static Talon _elevatorMotor;	
+	private static Talon _grabberMotor;
+	private static Talon _leftFrontMotor;
+	private static Talon _rightFrontMotor;
+	private static Talon _leftRearMotor;
+	private static Talon _rightRearMotor;
+	private static RangeFinder _driveTrainRangeFinder;		
+	private static AnalogGyro _gyro;
+	private static DigitalInput _elevatorMaxBreaker;				
+	private static DigitalInput _elevatorMinBreaker;		
+	private static DigitalInput _elevatorScaleBreaker;				
+	private static DigitalInput _elevatorSwitchBreaker;
+	private static DigitalInput _grabberBreakerLeft;
+	private static DigitalInput _grabberBreakerRight;
+	private static Counter _leftEncoder;
+	private static Counter _rightEncoder;
 	
 	private static Command _testCommand;
 	private static Command _driveViaStickCommand;
 	private static Command _elevateViaStickCommand;
-
+	private static Command _grabberCommand;
+	
 	public static Joystick _driveJoyStick;
 	public static Joystick _elevatorJoyStick;
 	public static Joystick _buttonStation;
-	public static Button _rungButton;
-	public static Button _scaleButton;
-	public static Button _switchButton;
-	public static Button _portalButton;
-	public static Button _exchangeButton;
-	public static Button _grabberOpenButton;
-	public static Button _grabberCloseButton;
+	public static JoystickButton _grabberButton;
 	
     private static Command _autoCommand;
     Command _teleopCommand;
+    
     SendableChooser chooser;
 
     /**
@@ -70,55 +79,41 @@ public class Robot extends IterativeRobot {
     	_driveJoyStick = new Joystick(_ioMap.IO_DriveJoystick);
     	_elevatorJoyStick = new Joystick(_ioMap.IO_ElevatorJoystick);
 	    _buttonStation = new Joystick(_ioMap.IO_ButtonStation);
+	   
+	    _grabberButton = new JoystickButton(_buttonStation, _ioMap.IO_GrabberButton);
 	    
-	    _rungButton = new JoystickButton(_buttonStation, _ioMap.IO_RungButton);
-	    _scaleButton = new JoystickButton(_buttonStation, _ioMap.IO_ScaleButton);
-	    _switchButton = new JoystickButton(_buttonStation, _ioMap.IO_SwitchButton);
-	    _portalButton = new JoystickButton(_buttonStation, _ioMap.IO_PortalButton);
-	    _exchangeButton = new JoystickButton(_buttonStation, _ioMap.IO_ExchangeButton);
-	    _grabberOpenButton = new JoystickButton(_buttonStation, _ioMap.IO_GrabberOpenButton);
-	    _grabberCloseButton = new JoystickButton(_buttonStation, _ioMap.IO_GrabberCloseButton);
-	    
-    	// Subsystems
-    	_elevatorMotor = new SimpleMotor(_ioMap.PWM_elevatorMotor);				
-    	_elevatorMaxBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMaxBreaker);		
-    	_elevatorMinBreaker = new LimitSwitch(_ioMap.DIO_ElevatorMinBreaker);			
+    	// Devices
+    	_elevatorMotor = new Talon(_ioMap.PWM_elevatorMotor);				
+    	_elevatorMaxBreaker = new DigitalInput(_ioMap.DIO_ElevatorMaxBreaker);		
+    	_elevatorMinBreaker = new DigitalInput(_ioMap.DIO_ElevatorMinBreaker);			
+    	_elevatorSwitchBreaker = new DigitalInput(_ioMap.DIO_ElevatorSwitchBreaker);		
+    	_elevatorScaleBreaker = new DigitalInput(_ioMap.DIO_ElevatorScaleBreaker);
       	_driveTrainRangeFinder = new RangeFinder(_ioMap.AIO_DriveTrainRangeFinder);
-      	//_elevatorRangeFinder = new RangeFinder(_ioMap.AIO_ElevatorRangeFinder);
-      	_gyro = new Gyroscope(_ioMap.AIO_Gyroscope);
-    	_accelerometer = new Accelerometer();
-    	_driveTrain = new DriveTrain(_ioMap.PWM_leftFrontMotor, _ioMap.PWM_rightFrontMotor,
-				_ioMap.PWM_leftRearMotor, _ioMap.PWM_rightRearMotor,
-				_ioMap.DIO_leftFrontEncoder, _ioMap.DIO_rightFrontEncoder,
-				_ioMap.DIO_leftRearEncoder, _ioMap.DIO_rightRearEncoder,
-				_driveJoyStick, _operatingParameters);
-    	_elevator = new Elevator(_elevatorMotor, _elevatorMaxBreaker, _elevatorMinBreaker);
+       	_gyro = new AnalogGyro(_ioMap.AIO_Gyroscope);
+       	_grabberMotor = new Talon(_ioMap.PWM_grabberOpenCloseMotor);
+       	_grabberBreakerLeft = new DigitalInput(_ioMap.DIO_grabberBreakerLeft);
+       	_grabberBreakerRight = new DigitalInput(_ioMap.DIO_grabberBreakerRight);
+       	_leftFrontMotor = new Talon(_ioMap.PWM_leftFrontMotor);
+       	_rightFrontMotor = new Talon(_ioMap.PWM_rightFrontMotor);
+       	_leftRearMotor = new Talon(_ioMap.PWM_leftRearMotor);
+       	_rightRearMotor = new Talon(_ioMap.PWM_rightRearMotor);
+       	_leftEncoder = new Counter(_ioMap.DIO_leftEncoder);
+       	_rightEncoder = new Counter(_ioMap.DIO_rightEncoder);
+       	
+       	// Subsystems
+    	_driveTrain = new DriveTrain(_leftFrontMotor, _rightFrontMotor, _leftRearMotor, _rightRearMotor,
+				_leftEncoder, _rightEncoder, _gyro, _driveTrainRangeFinder, _driveJoyStick, _operatingParameters);
+    	_elevator = new Elevator(_elevatorMotor, _elevatorMaxBreaker, _elevatorMinBreaker, _elevatorScaleBreaker, _elevatorSwitchBreaker);
     	
-    	_grabber = new Grabber(_ioMap.PWM_grabberOpenCloseMotor, _ioMap.PWM_grabberLeftGrabEjectMotor, _ioMap.PWM_grabberRightGrabEjectMotor);
+    	_grabber = new Grabber(_grabberMotor, _grabberBreakerLeft, _grabberBreakerRight);
     	
     	// Commands
-    	_testCommand = new TestCommand(_gyro);
+    	_testCommand = new TestCommand(_driveTrainRangeFinder);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
     	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick);
+    	_grabberCommand = new GrabberCommand(_grabber, _grabberButton);
     	
-	/*
-    	
-    	_rungButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, _elevatorMinBreaker, 
-    			_elevatorMaxBreaker, ElevatorPosition.RUNG, _operatingParameters));
-    	
-    	_scaleButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
-    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _operatingParameters));
-    	_switchButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
-    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _operatingParameters));
-    	_portalButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
-    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.PORTAL, _operatingParameters));
-    	_exchangeButton.whenPressed(new ElevatorAutoCommand(_elevatorMotor, _elevatorRangeFinder, 
-    			_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.EXCHANGE, _operatingParameters));
-    	
-    	_grabberOpenButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.OPEN));
-    	_grabberCloseButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.CLOSE));
-      */     	
-    	chooser = new SendableChooser();
+		chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
       //  SmartDashboard.putData("Auto mode", chooser);
@@ -185,7 +180,8 @@ public class Robot extends IterativeRobot {
         if (_autoCommand != null) 
         	_autoCommand.cancel();
         
-        _teleopCommand = new TeleOpCommand(_elevateViaStickCommand, _driveViaStickCommand);
+        
+        _teleopCommand = new TeleOpCommand(_elevateViaStickCommand, _driveViaStickCommand, _grabberCommand);
         System.out.println(_teleopCommand.getName());
         _teleopCommand.start();
 
@@ -207,15 +203,10 @@ public class Robot extends IterativeRobot {
     
     private Command GetAutoModeCommand()
     {
-    	return null;
-    	/*
     	String gameData;
         gameData = DriverStation.getInstance().getGameSpecificMessage();
-        String position = _operatingParameters.StartingAlignment(); //SmartDashboard.getString("position", "C");
+        String position = _operatingParameters.StartingAlignment(); 
         Command cmd = null;
-        double autoSpeed = _operatingParameters.AutoSpeed();
-        double autoSwitchDistance = _operatingParameters.SwitchDistance();
-        double autoScaleDistance = _operatingParameters.ScaleDistance();
         
         switch (position)
         {
@@ -228,71 +219,49 @@ public class Robot extends IterativeRobot {
         		
         	break;
         	
-//        	 AutoSideTarget(DriveTrain driveTrain, SimpleMotor elevatorMotor, RangeFinder elevatorRangeFinder, 
-//        				LimitSwitch minBreaker, LimitSwitch maxBreaker, ElevatorPosition elevatorPosition,  
-//        			Gyroscope gyro, RangeFinder driveTrainRangeFinder, RotationDirection rotateDirection, 
-//        			double targetSpeed, double targetDistance) 
-//        	        	
+        	         	
         case "L":
         case "l":
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
-        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
-        				_driveTrainRangeFinder,	RotationDirection.CLOCKWISE,
-        				autoSpeed, autoSwitchDistance, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.CLOCKWISE, _operatingParameters);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
-        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
-        				_driveTrainRangeFinder,	RotationDirection.CLOCKWISE,
-        				autoSpeed, autoSwitchDistance, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.CLOCKWISE, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
-        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _gyro, 
-        				_driveTrainRangeFinder,	RotationDirection.CLOCKWISE,
-        				autoSpeed, autoScaleDistance, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, RotationDirection.CLOCKWISE, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		cmd = new AutoToLine(_driveTrain);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
         	else
         	{	
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
-        		cmd = new AutoToLine(_driveTrain);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
         	}
         	break;
     	
         case "R": 
         case "r": 
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		cmd = new AutoToLine(_driveTrain);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
-        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SCALE, _gyro, 
-        				_driveTrainRangeFinder,	RotationDirection.COUNTERCLOCKWISE,
-        				autoSpeed, autoScaleDistance, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, RotationDirection.COUNTERCLOCKWISE, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
-        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
-        				_driveTrainRangeFinder,	RotationDirection.COUNTERCLOCKWISE,
-        				autoSpeed, autoSwitchDistance, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.COUNTERCLOCKWISE, _operatingParameters);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevatorMotor, _elevatorRangeFinder,
-        				_elevatorMinBreaker, _elevatorMaxBreaker, ElevatorPosition.SWITCH, _gyro, 
-        				_driveTrainRangeFinder,	RotationDirection.COUNTERCLOCKWISE,
-        				autoSpeed, autoSwitchDistance, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.COUNTERCLOCKWISE, _operatingParameters);
         	else
         	{
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
-        		cmd = new AutoToLine(_driveTrain);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
     		}	
         	break;
         	
         	default:
         	{
         		System.out.printf("unknown position %s \n", position);
-        		cmd = new AutoToLine(_driveTrain);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
         	}
         }
         
         return cmd;
-        */
+        
     }
 }
