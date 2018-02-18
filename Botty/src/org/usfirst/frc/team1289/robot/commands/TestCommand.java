@@ -2,6 +2,7 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
 
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -10,27 +11,33 @@ import edu.wpi.first.wpilibj.command.Command;
  */
 public class TestCommand extends Command 
 {
-	private static RangeFinder _rangeFinder;
-	//private static Timer _timer;
+	private static SpeedController _motor;
+	private static Timer _timer;
 	private boolean _isDone = false;
 	
-	public TestCommand(RangeFinder rf) 
+	public TestCommand(SpeedController motor) 
     {
-		_rangeFinder = rf;
-		//_timer = new Timer();
+		_motor = motor;
+		_timer = new Timer();
     }
 
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    	//_timer.reset();
-    	//_timer.start();
+    	_timer.reset();
+    	_timer.start();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	System.out.println(_rangeFinder.GetRangeInInches());
+    	_motor.set(0.3);
+    	if (_timer.get() > 5.0)
+    	{
+    		_motor.stopMotor();
+    		_motor.set(-0.3);
+    	}
+    	
     }
 
     // Make this return true when this Command no longer needs to run execute()

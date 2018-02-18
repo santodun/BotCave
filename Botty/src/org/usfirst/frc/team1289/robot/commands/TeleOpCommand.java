@@ -12,6 +12,6 @@ public class TeleOpCommand extends CommandGroup {
     {
         addParallel(elevator);
         addParallel(driveTrain);
-       // addParallel(grabber);
+        addParallel(grabber);
     }
 }

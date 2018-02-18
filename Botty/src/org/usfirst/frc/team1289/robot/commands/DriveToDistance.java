@@ -36,7 +36,7 @@ public class DriveToDistance extends Command {
 		double rightFrontDistance = _driveTrain.GetRightFrontEncoderDistance();
 		double averageDistance = Math.abs((leftFrontDistance + rightFrontDistance) / 2.0 );
 		System.out.printf("%f %f %f\n", leftFrontDistance, rightFrontDistance, averageDistance);
-		//System.out.printf("%d, %f\n", _driveTrain.GetLeftFrontEncoderCount(), averageDistance);
+		averageDistance = leftFrontDistance;
 		if (averageDistance < _distance)
 			return false;
 		else

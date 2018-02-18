@@ -80,7 +80,7 @@ public class Robot extends IterativeRobot {
     	_elevatorJoyStick = new Joystick(_ioMap.IO_ElevatorJoystick);
 	    _buttonStation = new Joystick(_ioMap.IO_ButtonStation);
 	   
-	    _grabberButton = new JoystickButton(_buttonStation, _ioMap.IO_GrabberButton);
+	    _grabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberButton);
 	    
     	// Devices
     	_elevatorMotor = new Talon(_ioMap.PWM_elevatorMotor);				
@@ -108,10 +108,12 @@ public class Robot extends IterativeRobot {
     	_grabber = new Grabber(_grabberMotor, _grabberBreakerLeft, _grabberBreakerRight);
     	
     	// Commands
-    	_testCommand = new TestCommand(_driveTrainRangeFinder);
+    	_testCommand = new TestCommand(_grabberMotor);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
     	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick);
     	_grabberCommand = new GrabberCommand(_grabber, _grabberButton);
+    	
+    	//_grabberButton.whenPressed(new GrabberCommand(_grabber));
     	
 		chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
@@ -180,7 +182,7 @@ public class Robot extends IterativeRobot {
         if (_autoCommand != null) 
         	_autoCommand.cancel();
         
-        
+       // _teleopCommand = _testCommand;
         _teleopCommand = new TeleOpCommand(_elevateViaStickCommand, _driveViaStickCommand, _grabberCommand);
         System.out.println(_teleopCommand.getName());
         _teleopCommand.start();
@@ -213,9 +215,9 @@ public class Robot extends IterativeRobot {
         case "C": 
         case "c":
         	if (gameData.charAt(0) == 'L')
-        		cmd = new AutoCenterLeft(_driveTrain);
+        		cmd = new AutoCenterTarget(_driveTrain, RotationDirection.CLOCKWISE);
         	else
-        		cmd = new AutoCenterRight(_driveTrain);
+        		cmd = new AutoCenterTarget(_driveTrain, RotationDirection.COUNTERCLOCKWISE);
         		
         	break;
         	

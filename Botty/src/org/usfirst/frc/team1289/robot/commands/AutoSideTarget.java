@@ -17,9 +17,9 @@ public class AutoSideTarget extends CommandGroup
 		double targetSpeed = operatingParameters.AutoSpeed();
 		
 		if (rotateDirection == RotationDirection.CLOCKWISE)
-			degrees = 90;
+			degrees = operatingParameters.DriveTrainRotationArc();
 		else
-			degrees = -90;
+			degrees = - operatingParameters.DriveTrainRotationArc();
 		
 		if (elevatorPosition == ElevatorPosition.SCALE)
 			targetDistance = operatingParameters.ScaleDistance();
@@ -29,7 +29,7 @@ public class AutoSideTarget extends CommandGroup
 		addSequential(new DriveAndLift(driveTrain, elevator, 
 				elevatorPosition, targetSpeed, targetDistance, operatingParameters));
 		addSequential(new Rotate(driveTrain, rotateDirection, degrees));
-		addSequential(new DriveUntilDistance(driveTrain, 27));
+		addSequential(new DriveToDistance(driveTrain, 0.2, 10));
 
     }
 }

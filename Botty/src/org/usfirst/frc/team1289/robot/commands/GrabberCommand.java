@@ -23,14 +23,22 @@ public class GrabberCommand extends Command
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    	
+    	//System.out.println("grabbercommand");
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
+    	//System.out.println(_button.get());
     	if (_button.get())
     		_grabber.ActuateGrabber();
+    	
+    	if (_grabber.IsDone())
+    	{
+    		_grabber.StopOpenCloseActuation();
+    	//	_isDone = true;
+    	}
+    	
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -47,6 +55,9 @@ public class GrabberCommand extends Command
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
-    protected void interrupted() {
+    protected void interrupted() 
+    {
+    	System.out.println("Interupted");
+    	_isDone = true;
     }
 }

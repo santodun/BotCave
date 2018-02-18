@@ -47,7 +47,7 @@ public class DriveTrain extends PIDSubsystem
 						Joystick joystick, OperatingParameters parameters)
 	{		
 		super("DriveTrain", parameters.DriveTrainPIDProportion(), parameters.DriveTrainPIDIntegral(), parameters.DriveTrainPIDDerivative());
-		
+	// System.out.println(parameters.DriveTrainPIDProportion());
 		_leftFrontMotor = leftFront;
 		_leftRearMotor = leftRear;
 		_leftFrontMotor.setInverted(true);
@@ -84,23 +84,27 @@ public class DriveTrain extends PIDSubsystem
 		_gyro.calibrate();
 		_gyro.reset();
 		
-		getPIDController().setContinuous(false);
+		getPIDController().setContinuous(true);
 		setSetpoint(0.0);
 		setAbsoluteTolerance(1.0);
 		setInputRange(-90.0, 90.0); 
-		setOutputRange(-1.0, 1.0);
+		setOutputRange(-0.1, 0.1);
+		enable();
 	}
 	   
 	@Override
 	 protected double returnPIDInput()
 	 {
-		 return _gyro.getAngle();
+		double angle = _gyro.getAngle();
+		//System.out.printf("%.2f\t", angle);
+		 return angle; //_gyro.getAngle();
 	 }
 	 
 	@Override
 	 protected void usePIDOutput(double output)
 	 {
 		// System.out.printf("%f %f\n", getPIDController().getError(), output);
+		//System.out.printf("%.2f\n", output);
 		 _pidOutput = output;
 	 }
 	 

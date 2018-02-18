@@ -19,6 +19,7 @@ public class OperatingParameters
 	private String _driveTrainProportionKey = "DriveTrainProportionKey";
 	private String _driveTrainIntegralKey = "DriveTrainIntegralKey";
 	private String _driveTrainDerivativeKey = "DriveTrainDerivativeKey";
+	private String _driveTrainRotationArcKey = "DriveTrainRotationArc";
 	
 	// Values
 	private double _autoSpeed = 0.4;
@@ -30,10 +31,10 @@ public class OperatingParameters
 	private double _driveTrainDeadBand = 0.05;
 	private double _driveTrainRotateSpeed = 0.2;
 	private double _driveTrainRotateRotation  = 0.3;
-	private double _driveTrainProportion = 0.1;
+	private double _driveTrainProportion = 0.01;
 	private double _driveTrainIntegral = 0.0;
 	private double _driveTrainDerivative = 0.0;
-	
+	private int _driveTrainRotationArc = 80;
 	
 	
 	public OperatingParameters()
@@ -51,6 +52,7 @@ public class OperatingParameters
 		_preferences.putDouble(_driveTrainProportionKey, _driveTrainProportion);
 		_preferences.putDouble(_driveTrainIntegralKey, _driveTrainIntegral);
 		_preferences.putDouble(_driveTrainDerivativeKey, _driveTrainDerivative);
+		_preferences.putInt(_driveTrainRotationArcKey, _driveTrainRotationArc);
 	}
 	
 	public String StartingAlignment()
@@ -111,5 +113,10 @@ public class OperatingParameters
 	public double DriveTrainPIDDerivative()
 	{
 		return _preferences.getDouble(_driveTrainDerivativeKey, _driveTrainDerivative);
+	}
+	
+	public int DriveTrainRotationArc()
+	{ 
+		return _preferences.getInt(_driveTrainRotationArcKey, _driveTrainRotationArc);
 	}
 }
