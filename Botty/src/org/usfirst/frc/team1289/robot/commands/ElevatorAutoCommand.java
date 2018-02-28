@@ -38,14 +38,15 @@ public class ElevatorAutoCommand extends Command
     	ElevatorPosition lastPosition = _elevator.LastKnownPosition();
     	double speed = _operatingParameters.ElevatorSpeed();
     	
+    	System.out.printf("%d %d %f\n", _targetPosition.ordinal(), lastPosition.ordinal(), speed);
     	if (_targetPosition.ordinal() > lastPosition.ordinal())
     	{
     		_direction = ElevatorDirection.UP;
-    		speed = speed;
+    		speed =  speed;
     	}	
     	else
     	{
-    		speed = -speed;
+    		speed = - speed;
     		_direction = ElevatorDirection.DOWN;
     	}
 
@@ -55,27 +56,13 @@ public class ElevatorAutoCommand extends Command
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-    	boolean atScale = _elevator.IsAtScale();
-    	boolean atSwitch = _elevator.IsAtMax();
-    	boolean atMax = _elevator.IsAtMax();
-    	boolean atMin = _elevator.IsAtMin();
-    	
-    	if (atMin)
-    		System.out.print("Min");
-    	if (atSwitch)
-    		System.out.print("SWITCH");
-    	if (atScale)
-    		System.out.print("SCALE");
-    	if (atMax)
-    		System.out.print("MAX");
-    	
     	if (_targetPosition == ElevatorPosition.SCALE)
     	{
     		if (_elevator.IsAtScale())
     			return true;
     	}
     	
-    	if (_targetPosition == ElevatorPosition.MAX/*SWITCH*/)
+    	if (_targetPosition == ElevatorPosition.SWITCH)
     	{
     		if (_elevator.IsAtSwitch())
     			return true;

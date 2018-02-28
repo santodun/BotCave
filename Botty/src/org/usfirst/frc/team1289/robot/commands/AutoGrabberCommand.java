@@ -6,36 +6,33 @@ import org.usfirst.frc.team1289.robot.subsystems.Grabber;
 /**
  *
  */
-public class GrabberCommand extends Command 
+public class AutoGrabberCommand extends Command 
 {
 
 	Grabber _grabber;
-	GrabberDirection _direction;
-	boolean _isDone = false;
 	
-    public GrabberCommand(Grabber grabber, GrabberDirection direction) 
+    public AutoGrabberCommand(Grabber grabber) 
     {
     	_grabber = grabber;
-    	_direction = direction;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() 
     {
     	//System.out.println("grabbercommand");
-    	//_grabber.SetGrabberInitialState(GrabberState.OPEN);
+    //	_grabber.SetGrabberInitialState(GrabberState.CLOSED);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	_grabber.ActuateGrabber(_direction);
+    	//_grabber.ActuateGrabber(_direction????);    	
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-    	return _grabber.IsDone();
+        return _grabber.IsDone();
     }
 
     // Called once after isFinished returns true
@@ -48,7 +45,6 @@ public class GrabberCommand extends Command
     // subsystems is scheduled to run
     protected void interrupted() 
     {
-    	System.out.println("Interupted");
-    	_isDone = true;
+    	end();
     }
 }

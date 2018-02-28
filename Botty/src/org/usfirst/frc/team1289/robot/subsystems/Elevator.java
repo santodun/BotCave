@@ -15,6 +15,7 @@ public class Elevator extends Subsystem
 	private static DigitalInput _scaleLimit;
 	private static DigitalInput _switchLimit;
 	private static ElevatorPosition _lastKnownPosition;
+	private static double _speed;
 	
 	public Elevator(SpeedController motor, DigitalInput maxLimitSwitch, DigitalInput minLimitSwitch,
 						DigitalInput scaleLimitSwitch, DigitalInput switchLimitSwitch)
@@ -25,7 +26,8 @@ public class Elevator extends Subsystem
 		_switchLimit = switchLimitSwitch;
 		_scaleLimit = scaleLimitSwitch;
 		_lastKnownPosition = ElevatorPosition.MIN;
-		//_motor.setInverted(true);
+		_speed = 0.0;
+		_motor.setInverted(true);
 	}
 	
     public void initDefaultCommand() {
@@ -35,25 +37,21 @@ public class Elevator extends Subsystem
     
     public boolean IsAtMax()
     {
-    	_lastKnownPosition = ElevatorPosition.MAX;
     	return ! _maxLimit.get();
     }
     
     public boolean IsAtMin()
     {
-    	_lastKnownPosition = ElevatorPosition.MIN;
     	return ! _minLimit.get();
     }
     
     public boolean IsAtSwitch()
     {
-    	_lastKnownPosition = ElevatorPosition.SWITCH;
     	return ! _switchLimit.get();
     }
     
     public boolean IsAtScale()
     {
-    	_lastKnownPosition = ElevatorPosition.SCALE;
     	return ! _scaleLimit.get();
     }
     
@@ -65,6 +63,7 @@ public class Elevator extends Subsystem
     public void Move(double speed)
     {
     	double scaledSpeed = 0.0;
+    	boolean foo = true;
     	
     	if (speed > -0.1 && speed < 0.1)
     		scaledSpeed = 0.0;
@@ -75,7 +74,20 @@ public class Elevator extends Subsystem
     	else
     		scaledSpeed = speed;
     	
+    	_speed = scaledSpeed;
+    //	System.out.println(scaledSpeed);
     	_motor.set(scaledSpeed);
+    	
+    	if (IsAtScale())
+    		_lastKnownPosition = ElevatorPosition.SCALE;
+    	else if (IsAtSwitch())
+    		_lastKnownPosition = ElevatorPosition.SWITCH;
+    	else if (IsAtMax())
+    		_lastKnownPosition = ElevatorPosition.MAX;
+    	else if (IsAtMin())
+    		_lastKnownPosition = ElevatorPosition.MIN;
+    	else
+    		foo = false; 
     }
     
     public void Stop()
@@ -85,7 +97,7 @@ public class Elevator extends Subsystem
     
     public double GetCurrentSpeed()
     {
-    	return _motor.get();
+    	return _speed; 
     }
 }
 

@@ -20,6 +20,7 @@ public class OperatingParameters
 	private String _driveTrainIntegralKey = "DriveTrainIntegralKey";
 	private String _driveTrainDerivativeKey = "DriveTrainDerivativeKey";
 	private String _driveTrainRotationArcKey = "DriveTrainRotationArc";
+	private String _grabberSpeedKey = "GrabberSpeed";
 	
 	// Values
 	private double _autoSpeed = 0.4;
@@ -35,7 +36,7 @@ public class OperatingParameters
 	private double _driveTrainIntegral = 0.0;
 	private double _driveTrainDerivative = 0.0;
 	private int _driveTrainRotationArc = 80;
-	
+	private double _grabberSpeed = 0.8;
 	
 	public OperatingParameters()
 	{
@@ -53,6 +54,7 @@ public class OperatingParameters
 		_preferences.putDouble(_driveTrainIntegralKey, _driveTrainIntegral);
 		_preferences.putDouble(_driveTrainDerivativeKey, _driveTrainDerivative);
 		_preferences.putInt(_driveTrainRotationArcKey, _driveTrainRotationArc);
+		_preferences.putDouble(_grabberSpeedKey, _grabberSpeed);
 	}
 	
 	public String StartingAlignment()
@@ -118,5 +120,10 @@ public class OperatingParameters
 	public int DriveTrainRotationArc()
 	{ 
 		return _preferences.getInt(_driveTrainRotationArcKey, _driveTrainRotationArc);
+	}
+	
+	public double GrabberSpeed()
+	{ 
+		return _preferences.getDouble(_grabberSpeedKey, _grabberSpeed);
 	}
 }

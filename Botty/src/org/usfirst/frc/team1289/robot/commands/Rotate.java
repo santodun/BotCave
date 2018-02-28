@@ -16,7 +16,8 @@ public class Rotate extends Command
 	private RotationDirection _direction;
 	private int _targetDegrees;
 	
-	    public Rotate(DriveTrain dt, RotationDirection direction, int degrees) {
+	public Rotate(DriveTrain dt, RotationDirection direction, int degrees) 
+	{
     	_driveTrain = dt;
     	_direction = direction;
     	_targetDegrees = degrees;
@@ -40,8 +41,8 @@ public class Rotate extends Command
     	boolean done = false;
     	
     	double heading = _driveTrain.GetHeading();
-    	//System.out.printf("Heading %f target %d\n", heading, _targetDegrees);
-    	//System.out.println(_direction.ordinal());
+//    	System.out.printf("Heading %f target %d\n", heading, _targetDegrees);
+//    	System.out.println(_direction.ordinal());
     	if (_direction == RotationDirection.CLOCKWISE)
     	{
     		if (heading > (double) _targetDegrees)

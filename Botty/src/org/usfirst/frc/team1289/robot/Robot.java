@@ -36,7 +36,10 @@ public class Robot extends IterativeRobot {
 	private static DriveTrain _driveTrain;
 	private static Grabber _grabber;
 	private static Elevator _elevator;
+	private static Retractor _retractor;
+	public static Camera _camera;
 	
+	private static Talon _retractorMotor;
 	private static Talon _elevatorMotor;	
 	private static Talon _grabberMotor;
 	private static Talon _leftFrontMotor;
@@ -51,6 +54,7 @@ public class Robot extends IterativeRobot {
 	private static DigitalInput _elevatorSwitchBreaker;
 	private static DigitalInput _grabberBreakerLeft;
 	private static DigitalInput _grabberBreakerRight;
+	private static DigitalInput _retractorBreaker;
 	private static Counter _leftEncoder;
 	private static Counter _rightEncoder;
 	
@@ -62,7 +66,10 @@ public class Robot extends IterativeRobot {
 	public static Joystick _driveJoyStick;
 	public static Joystick _elevatorJoyStick;
 	public static Joystick _buttonStation;
-	public static JoystickButton _grabberButton;
+	public static JoystickButton _grabberOpenButton;
+	public static JoystickButton _grabberCloseButton;
+	public static JoystickButton _retractGrabberButton;
+	public static JoystickButton _deployGrabberButton;
 	
     private static Command _autoCommand;
     Command _teleopCommand;
@@ -80,14 +87,19 @@ public class Robot extends IterativeRobot {
     	_elevatorJoyStick = new Joystick(_ioMap.IO_ElevatorJoystick);
 	    _buttonStation = new Joystick(_ioMap.IO_ButtonStation);
 	   
-	    _grabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberButton);
+	    _grabberOpenButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberOpenButton);
+	    _grabberCloseButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberCloseButton);
+	    _retractGrabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_RetractorRetractButton);
+	    _deployGrabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_RetractorDeployButton);
 	    
     	// Devices
     	_elevatorMotor = new Talon(_ioMap.PWM_elevatorMotor);				
+    	_retractorMotor = new Talon(_ioMap.PWM_retractorMotor);
     	_elevatorMaxBreaker = new DigitalInput(_ioMap.DIO_ElevatorMaxBreaker);		
     	_elevatorMinBreaker = new DigitalInput(_ioMap.DIO_ElevatorMinBreaker);			
     	_elevatorSwitchBreaker = new DigitalInput(_ioMap.DIO_ElevatorSwitchBreaker);		
     	_elevatorScaleBreaker = new DigitalInput(_ioMap.DIO_ElevatorScaleBreaker);
+    	_retractorBreaker = new DigitalInput(_ioMap.DIO_RetractorBreaker);
       	_driveTrainRangeFinder = new RangeFinder(_ioMap.AIO_DriveTrainRangeFinder);
        	_gyro = new AnalogGyro(_ioMap.AIO_Gyroscope);
        	_grabberMotor = new Talon(_ioMap.PWM_grabberOpenCloseMotor);
@@ -105,15 +117,21 @@ public class Robot extends IterativeRobot {
 				_leftEncoder, _rightEncoder, _gyro, _driveTrainRangeFinder, _driveJoyStick, _operatingParameters);
     	_elevator = new Elevator(_elevatorMotor, _elevatorMaxBreaker, _elevatorMinBreaker, _elevatorScaleBreaker, _elevatorSwitchBreaker);
     	
-    	_grabber = new Grabber(_grabberMotor, _grabberBreakerLeft, _grabberBreakerRight);
+    	_grabber = new Grabber(_grabberMotor, _grabberBreakerLeft, _grabberBreakerRight, _operatingParameters);
+    	_retractor = new Retractor(_retractorMotor, _retractorBreaker);
+    	_camera = new Camera();
+    	//_camera.Start();
     	
     	// Commands
     	_testCommand = new TestCommand(_grabberMotor);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
     	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick);
-    	_grabberCommand = new GrabberCommand(_grabber, _grabberButton);
+    	//_grabberCommand = new GrabberCommand(_grabber, _grabberButton);
     	
-    	//_grabberButton.whenPressed(new GrabberCommand(_grabber));
+    	_grabberOpenButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.OPEN));
+    	_grabberCloseButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.CLOSE));
+    	_retractGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.UP));
+    	_deployGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.DOWN));
     	
 		chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
@@ -215,51 +233,58 @@ public class Robot extends IterativeRobot {
         case "C": 
         case "c":
         	if (gameData.charAt(0) == 'L')
-        		cmd = new AutoCenterTarget(_driveTrain, RotationDirection.CLOCKWISE);
+        		cmd = new AutoCenterTarget(_driveTrain, RotationDirection.COUNTERCLOCKWISE, 
+        				_elevator, ElevatorPosition.SWITCH, _operatingParameters, _grabber, _retractor);
         	else
-        		cmd = new AutoCenterTarget(_driveTrain, RotationDirection.COUNTERCLOCKWISE);
+        		cmd = new AutoCenterTarget(_driveTrain, RotationDirection.CLOCKWISE, 
+        				_elevator, ElevatorPosition.SWITCH, _operatingParameters, _grabber, _retractor);
         		
         	break;
         	
-        	         	
         case "L":
         case "l":
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.CLOCKWISE, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
+        				RotationDirection.CLOCKWISE, _operatingParameters, _grabber);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.CLOCKWISE, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
+        				RotationDirection.CLOCKWISE, _operatingParameters, _grabber);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, RotationDirection.CLOCKWISE, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, 
+        				RotationDirection.CLOCKWISE, _operatingParameters, _grabber);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
         	else
         	{	
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
-        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
         	}
         	break;
     	
         case "R": 
         case "r": 
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, RotationDirection.COUNTERCLOCKWISE, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, 
+        				RotationDirection.COUNTERCLOCKWISE, _operatingParameters, _grabber);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.COUNTERCLOCKWISE, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
+        				RotationDirection.COUNTERCLOCKWISE, _operatingParameters, _grabber);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, RotationDirection.COUNTERCLOCKWISE, _operatingParameters);
+        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
+        				RotationDirection.COUNTERCLOCKWISE, _operatingParameters, _grabber);
         	else
         	{
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);
-        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
     		}	
         	break;
         	
         	default:
         	{
         		System.out.printf("unknown position %s \n", position);
-        		cmd = new AutoToLine(_driveTrain, _operatingParameters);
+        		cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
         	}
         }
         
