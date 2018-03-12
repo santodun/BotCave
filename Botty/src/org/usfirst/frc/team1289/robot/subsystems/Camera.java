@@ -25,11 +25,11 @@ public class Camera extends Subsystem {
     
     public void Start() 
     {
-    	CameraServer.getInstance().startAutomaticCapture();			/** Santosh 01282017 **/
+    	//CameraServer.getInstance().startAutomaticCapture();			/** Santosh 01282017 **/
        
         
         new Thread(() -> {
-            UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+            UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
             camera.setResolution(640, 480);
             
             CvSink cvSink = CameraServer.getInstance().getVideo();

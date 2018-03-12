@@ -67,10 +67,6 @@ public class Elevator extends Subsystem
     	
     	if (speed > -0.1 && speed < 0.1)
     		scaledSpeed = 0.0;
-    	else if (speed > .4)
-    		scaledSpeed = .4;
-    	else if (speed < -.4)
-    		scaledSpeed = -.4;
     	else
     		scaledSpeed = speed;
     	

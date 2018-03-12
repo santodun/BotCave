@@ -41,7 +41,7 @@ public class Rotate extends Command
     	boolean done = false;
     	
     	double heading = _driveTrain.GetHeading();
-//    	System.out.printf("Heading %f target %d\n", heading, _targetDegrees);
+    	System.out.printf("Heading %f target %d\n", heading, _targetDegrees);
 //    	System.out.println(_direction.ordinal());
     	if (_direction == RotationDirection.CLOCKWISE)
     	{

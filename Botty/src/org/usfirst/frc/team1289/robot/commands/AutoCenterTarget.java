@@ -14,8 +14,11 @@ public class AutoCenterTarget extends CommandGroup {
     		ElevatorPosition elevatorPosition, OperatingParameters operatingParameters, Grabber grabber,
     		Retractor retractor) 
     {
-    	int heading = 30;
+    	int heading = operatingParameters.AutoCenterRotate();
     	RotationDirection secondRotationDirection;
+    	double speed = operatingParameters.AutoSpeed();
+    	double firstLastLegDistance = operatingParameters.AutoCenterFirstLastLegDistance();
+    	double middleLegDistance = operatingParameters.AutoCenterMiddleLegDistance();
     	
     	if (initialDirection == RotationDirection.CLOCKWISE)
     	{
@@ -30,14 +33,15 @@ public class AutoCenterTarget extends CommandGroup {
     	}
     	
     		
-    	addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN));
-    	addSequential(new DriveToDistance(dt, 0.2, 12.0));
+    	addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN, operatingParameters));
+    	addParallel(new ElevatorAutoCommand(elevator, elevatorPosition, operatingParameters));
+    	addSequential(new DriveToDistance(dt, speed, firstLastLegDistance));
     	addSequential(new Rotate(dt, initialDirection, heading));
-    	addSequential(new DriveAndLift(dt, elevator, elevatorPosition, 0.3, 250.0, operatingParameters));
-    	//addSequential(new DriveToDistance(dt, 0.3, 250.0));
+    	//addSequential(new DriveAndLift(dt, elevator, elevatorPosition, speed, middleLegDistance, operatingParameters));
+    	addSequential(new DriveToDistance(dt, speed, middleLegDistance));
     	addSequential(new Rotate(dt, secondRotationDirection, - heading));
-    	addSequential(new DriveToDistance(dt, 0.2, 20.0));
-    	//addSequential(new AutoGrabberCommand(grabber));
+    	addSequential(new DriveToDistance(dt, speed, firstLastLegDistance));
+    	addSequential(new GrabberCommand(grabber, GrabberDirection.OPEN));
     	
 
     }

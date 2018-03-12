@@ -35,17 +35,24 @@ public class DriveToDistance extends Command {
 		double leftFrontDistance = _driveTrain.GetLeftFrontEncoderDistance();
 		double rightFrontDistance = _driveTrain.GetRightFrontEncoderDistance();
 		double averageDistance = Math.abs((leftFrontDistance + rightFrontDistance) / 2.0 );
-		//System.out.printf("%f %f %f\n", leftFrontDistance, rightFrontDistance, averageDistance);
+		System.out.printf("%f %f %f\n", leftFrontDistance, rightFrontDistance, averageDistance);
 		//averageDistance = leftFrontDistance;
 		if (averageDistance < _distance)
 			return false;
 		else
+		{
+			System.out.println("D2D done");
+			System.out.flush();
 			return true;
+		}
     }
 
     // Called once after isFinished returns true
     protected void end() 
     {
+    	System.out.println("drive train stop");
+    	System.out.flush();
+    	_driveTrain.Stop();
     	_driveTrain.Reset();
     }
 

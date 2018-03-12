@@ -33,6 +33,7 @@ public class RobotMap {
 	public static final int IO_GrabberOpenButton = 2;
 	public static final int IO_RetractorRetractButton = 3;
 	public static final int IO_RetractorDeployButton = 4;
+	public static final int IO_HalfSpeedButton = 1;
 	
 	public static final int AIO_Gyroscope = 0;
 	public static final int AIO_DriveTrainRangeFinder = 1;

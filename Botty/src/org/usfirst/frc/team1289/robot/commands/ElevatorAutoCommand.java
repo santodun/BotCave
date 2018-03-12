@@ -36,9 +36,9 @@ public class ElevatorAutoCommand extends Command
     protected void execute() 
     {
     	ElevatorPosition lastPosition = _elevator.LastKnownPosition();
-    	double speed = _operatingParameters.ElevatorSpeed();
+    	double speed = 1.0;
     	
-    	System.out.printf("%d %d %f\n", _targetPosition.ordinal(), lastPosition.ordinal(), speed);
+    	//System.out.printf("%d %d %f\n", _targetPosition.ordinal(), lastPosition.ordinal(), speed);
     	if (_targetPosition.ordinal() > lastPosition.ordinal())
     	{
     		_direction = ElevatorDirection.UP;

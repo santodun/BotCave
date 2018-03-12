@@ -17,6 +17,8 @@ public class GrabberCommand extends Command
     {
     	_grabber = grabber;
     	_direction = direction;
+    	
+    	//System.out.printf("command %d\n", _direction.ordinal());
     }
 
     // Called just before this Command runs the first time
@@ -35,7 +37,13 @@ public class GrabberCommand extends Command
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-    	return _grabber.IsDone();
+    	if (_grabber.IsLeftBreakerClosed() && _direction == GrabberDirection.CLOSE)
+    		return true;
+    	
+    	if (_grabber.IsRightBreakerClosed() && _direction == GrabberDirection.OPEN)
+    		return true;
+    	
+    	return false;
     }
 
     // Called once after isFinished returns true

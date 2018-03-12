@@ -84,11 +84,11 @@ public class DriveTrain extends PIDSubsystem
 		_gyro.calibrate();
 		_gyro.reset();
 		
-		getPIDController().setContinuous(true);
 		setSetpoint(0.0);
 		setAbsoluteTolerance(1.0);
 		setInputRange(-90.0, 90.0); 
 		setOutputRange(-0.1, 0.1);
+		getPIDController().setContinuous(true);
 		enable();
 	}
 	   
@@ -151,13 +151,16 @@ public class DriveTrain extends PIDSubsystem
     		return (rawValue < 0.0) ? Math.pow(rawValue + deadBand, 3) : Math.pow(rawValue - deadBand, 3); 
     }
     
-    public void StickDrive()
+    public void StickDrive(boolean halfSpeedMode)
     {
     	double moveValue =  - _joystick.getY();
     	double rotateValue =  _joystick.getX();
     	  	
     	moveValue = ScaleValue(moveValue);
     	rotateValue = ScaleValue(rotateValue);
+    	
+    	if (halfSpeedMode)
+    		moveValue = moveValue * 0.5;
     	
     	_robotDrive.arcadeDrive(moveValue, rotateValue);
     }

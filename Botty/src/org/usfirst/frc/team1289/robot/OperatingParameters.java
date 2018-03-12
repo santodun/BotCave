@@ -11,7 +11,10 @@ public class OperatingParameters
 	private String _switchDistanceKey = "SwitchDistance";
 	private String _scaleDistanceKey = "ScaleDistance";
 	private String _autoLineDistanceKey = "AutoLineDistance";
-	private String _elevatorMotorSpeedKey = "ElevatorMotorSpeed";
+	private String _autoCenterFirstLastLegKey = "AutoCenterFirstLastLeg";
+	private String _autoCenterMiddleLegKey = "AutoCenterMiddleLeg";
+	private String _autoSideFinalLegDistanceKey = "AutoSideFinalLegDistance";
+	private String _elevatorMotorSpeedThresholdKey = "ElevatorMotorSpeed";
 	private String _startAlignmentKey = "StartAlignment";
 	private String _driveTrainDeadBandKey = "Drivetrain Deadband";
 	private String _driveTrainRotateSpeedKey  = "DriveTrainSpeed";
@@ -21,13 +24,18 @@ public class OperatingParameters
 	private String _driveTrainDerivativeKey = "DriveTrainDerivativeKey";
 	private String _driveTrainRotationArcKey = "DriveTrainRotationArc";
 	private String _grabberSpeedKey = "GrabberSpeed";
+	private String _retractorSpeedKey = "RetractorSpeed";
+	private String _autoCenterRotateKey = "AutoCenterRotate";
 	
 	// Values
 	private double _autoSpeed = 0.4;
 	private double _switchDistance = 250.0;
 	private double _scaleDistance = 400.0;
 	private double _autoLineDistance = 160.0;
-	private double _elevatorMotorSpeed = 0.3;
+	private double _autoCenterFirstLastLegDistance = 12.0;
+	private double _autoCenterMiddleLegDistance = 250.0;
+	private double _autoSideFinalLegDistance = 10.0;
+	private double _elevatorMotorThresholdSpeed = 0.3;
 	private String _startAlignment = "R";
 	private double _driveTrainDeadBand = 0.05;
 	private double _driveTrainRotateSpeed = 0.2;
@@ -35,8 +43,10 @@ public class OperatingParameters
 	private double _driveTrainProportion = 0.01;
 	private double _driveTrainIntegral = 0.0;
 	private double _driveTrainDerivative = 0.0;
-	private int _driveTrainRotationArc = 80;
-	private double _grabberSpeed = 0.8;
+	private int _driveTrainRotationArc = 75;
+	private double _grabberSpeed = 1.0;
+	private double _retractorSpeed = 0.7;
+	private int _autoCenterRotate = 30;
 	
 	public OperatingParameters()
 	{
@@ -46,7 +56,10 @@ public class OperatingParameters
 		_preferences.putDouble(_switchDistanceKey, _switchDistance);
 		_preferences.putDouble(_scaleDistanceKey, _scaleDistance);
 		_preferences.putDouble(_autoLineDistanceKey, _autoLineDistance);
-		_preferences.putDouble(_elevatorMotorSpeedKey, _elevatorMotorSpeed);
+		_preferences.putDouble(_autoCenterFirstLastLegKey, _autoCenterFirstLastLegDistance);
+		_preferences.putDouble(_autoCenterMiddleLegKey, _autoCenterMiddleLegDistance);
+		_preferences.putDouble(_autoSideFinalLegDistanceKey, _autoSideFinalLegDistance);
+		_preferences.putDouble(_elevatorMotorSpeedThresholdKey, _elevatorMotorThresholdSpeed);
 		_preferences.putDouble(_driveTrainDeadBandKey, _driveTrainDeadBand);
 		_preferences.putDouble(_driveTrainRotateSpeedKey, _driveTrainRotateSpeed);
 		_preferences.putDouble(_driveTrainRotateRotationKey, _driveTrainRotateRotation);
@@ -55,6 +68,34 @@ public class OperatingParameters
 		_preferences.putDouble(_driveTrainDerivativeKey, _driveTrainDerivative);
 		_preferences.putInt(_driveTrainRotationArcKey, _driveTrainRotationArc);
 		_preferences.putDouble(_grabberSpeedKey, _grabberSpeed);
+		_preferences.putDouble(_retractorSpeedKey, _retractorSpeed);
+		_preferences.putInt(_autoCenterRotateKey, _autoCenterRotate);
+	}
+	
+	public double AutoSideFinalLegDistance()
+	{
+		return _preferences.getDouble(_autoSideFinalLegDistanceKey, _autoSideFinalLegDistance);
+	}
+	
+	public double AutoCenterFirstLastLegDistance()
+	{
+		return _preferences.getDouble(_autoCenterFirstLastLegKey, _autoCenterFirstLastLegDistance);
+	}
+	
+	public double AutoCenterMiddleLegDistance()
+	{
+		return _preferences.getDouble(_autoCenterMiddleLegKey, _autoCenterMiddleLegDistance);
+	}
+	
+	
+	public int AutoCenterRotate()
+	{
+		return _preferences.getInt(_autoCenterRotateKey, _autoCenterRotate);
+	}
+	
+	public double RetractorSpeed()
+	{
+		return _preferences.getDouble(_retractorSpeedKey, _retractorSpeed);
 	}
 	
 	public String StartingAlignment()
@@ -87,9 +128,9 @@ public class OperatingParameters
 		return _preferences.getDouble(_scaleDistanceKey, _scaleDistance);
 	}
 	
-	public double ElevatorSpeed()
+	public double ElevatorThresholdSpeed()
 	{
-		return _preferences.getDouble(_elevatorMotorSpeedKey, _elevatorMotorSpeed);
+		return _preferences.getDouble(_elevatorMotorSpeedThresholdKey, _elevatorMotorThresholdSpeed);
 	}
 	
 	public double AutoLineDistance()

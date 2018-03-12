@@ -2,6 +2,7 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc.team1289.robot.subsystems.Retractor;
+import org.usfirst.frc.team1289.robot.OperatingParameters;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
@@ -13,11 +14,13 @@ public class ActuateRetractor extends Command
 	private Timer _timer;
 	private boolean _isDone = false;
 	private RetractorDirection _direction;
+	double _speed;
 	
-    public ActuateRetractor(Retractor retractor, RetractorDirection direction) 
+    public ActuateRetractor(Retractor retractor, RetractorDirection direction, OperatingParameters parameters) 
     {
     	_retractor = retractor;
     	_direction = direction;
+    	_speed = parameters.RetractorSpeed();
     	_timer = new Timer();
     }
 
@@ -32,11 +35,11 @@ public class ActuateRetractor extends Command
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	double speed = 0.7;
+    	double speed;
     	if (_direction == RetractorDirection.UP)
-    		speed = speed;
+    		speed = _speed;
     	else 
-    		speed = - speed;
+    		speed = - _speed;
     	
     	_retractor.Move(speed);
     }

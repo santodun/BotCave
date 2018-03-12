@@ -70,6 +70,7 @@ public class Robot extends IterativeRobot {
 	public static JoystickButton _grabberCloseButton;
 	public static JoystickButton _retractGrabberButton;
 	public static JoystickButton _deployGrabberButton;
+	public static JoystickButton _halfSpeedButton;
 	
     private static Command _autoCommand;
     Command _teleopCommand;
@@ -91,6 +92,7 @@ public class Robot extends IterativeRobot {
 	    _grabberCloseButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberCloseButton);
 	    _retractGrabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_RetractorRetractButton);
 	    _deployGrabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_RetractorDeployButton);
+	    _halfSpeedButton = new JoystickButton(_driveJoyStick, _ioMap.IO_HalfSpeedButton);
 	    
     	// Devices
     	_elevatorMotor = new Talon(_ioMap.PWM_elevatorMotor);				
@@ -120,18 +122,18 @@ public class Robot extends IterativeRobot {
     	_grabber = new Grabber(_grabberMotor, _grabberBreakerLeft, _grabberBreakerRight, _operatingParameters);
     	_retractor = new Retractor(_retractorMotor, _retractorBreaker);
     	_camera = new Camera();
-    	//_camera.Start();
+    	_camera.Start();
     	
     	// Commands
     	_testCommand = new TestCommand(_grabberMotor);
-    	_driveViaStickCommand = new DriveViaStick(_driveTrain);	
-    	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick);
-    	//_grabberCommand = new GrabberCommand(_grabber, _grabberButton);
+    	_driveViaStickCommand = new DriveViaStick(_driveTrain, _halfSpeedButton);	
+    	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick, _operatingParameters);
+    	//_grabberCommand = new GrabberCommand(_grabber);
     	
     	_grabberOpenButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.OPEN));
     	_grabberCloseButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.CLOSE));
-    	_retractGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.UP));
-    	_deployGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.DOWN));
+    	_retractGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.UP, _operatingParameters));
+    	_deployGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.DOWN, _operatingParameters));
     	
 		chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
@@ -227,6 +229,7 @@ public class Robot extends IterativeRobot {
         gameData = DriverStation.getInstance().getGameSpecificMessage();
         String position = _operatingParameters.StartingAlignment(); 
         Command cmd = null;
+   //     cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
         
         switch (position)
         {
@@ -244,14 +247,14 @@ public class Robot extends IterativeRobot {
         case "L":
         case "l":
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
-        				RotationDirection.CLOCKWISE, _operatingParameters, _grabber);
+        		cmd = new AutoSideTarget(_driveTrain, RotationDirection.COUNTERCLOCKWISE, 
+        				_elevator, ElevatorPosition.SWITCH, _operatingParameters, _grabber, _retractor);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
-        				RotationDirection.CLOCKWISE, _operatingParameters, _grabber);
+        		cmd = new AutoSideTarget(_driveTrain, RotationDirection.COUNTERCLOCKWISE, 
+        				_elevator, ElevatorPosition.SWITCH, _operatingParameters, _grabber, _retractor);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, 
-        				RotationDirection.CLOCKWISE, _operatingParameters, _grabber);
+        		cmd = new AutoSideTarget(_driveTrain, RotationDirection.COUNTERCLOCKWISE, 
+        				_elevator, ElevatorPosition.SCALE, _operatingParameters, _grabber, _retractor);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
         		cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
         	else
@@ -266,14 +269,14 @@ public class Robot extends IterativeRobot {
         	if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'L')
         		cmd = new AutoToLine(_driveTrain, _operatingParameters, _grabber, _retractor);
         	else if (gameData.charAt(0) == 'L' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SCALE, 
-        				RotationDirection.COUNTERCLOCKWISE, _operatingParameters, _grabber);
+        		cmd = new AutoSideTarget(_driveTrain, RotationDirection.CLOCKWISE, 
+        				_elevator, ElevatorPosition.SCALE, _operatingParameters, _grabber, _retractor);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'L')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
-        				RotationDirection.COUNTERCLOCKWISE, _operatingParameters, _grabber);
+        		cmd = new AutoSideTarget(_driveTrain, RotationDirection.CLOCKWISE, 
+        				_elevator, ElevatorPosition.SWITCH, _operatingParameters, _grabber, _retractor);
         	else if (gameData.charAt(0) == 'R' && gameData.charAt(1) == 'R')
-        		cmd = new AutoSideTarget(_driveTrain, _elevator, ElevatorPosition.SWITCH, 
-        				RotationDirection.COUNTERCLOCKWISE, _operatingParameters, _grabber);
+        		cmd = new AutoSideTarget(_driveTrain, RotationDirection.CLOCKWISE, 
+        				_elevator, ElevatorPosition.SWITCH, _operatingParameters, _grabber, _retractor);
         	else
         	{
         		System.out.printf("unknown set of gamedata %s %s \n", position, gameData);

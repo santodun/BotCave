@@ -35,12 +35,12 @@ public class Grabber extends Subsystem
 		_rightBreakerState = IsRightBreakerClosed();
 	}
 	
-	private boolean IsLeftBreakerClosed()
+	public boolean IsLeftBreakerClosed()
 	{
 		return ! _leftBreaker.get();
 	}
 
-	private boolean IsRightBreakerClosed()
+	public boolean IsRightBreakerClosed()
 	{
 		return ! _rightBreaker.get();
 	}
@@ -58,45 +58,45 @@ public class Grabber extends Subsystem
 		if (direction == GrabberDirection.CLOSE)
 			speed = - speed;
 		
-		_leftBreakerState = IsLeftBreakerClosed();
-		_rightBreakerState = IsRightBreakerClosed();
-		
-		if (_leftBreakerState == BREAKEROPEN && _rightBreakerState == BREAKEROPEN)
-			okToMove = true;
-		if (_leftBreakerState == BREAKERCLOSED && _rightBreakerState == BREAKEROPEN
-				&& direction == GrabberDirection.OPEN)
-			okToMove = true;
-		if (_leftBreakerState == BREAKEROPEN && _rightBreakerState == BREAKERCLOSED &&
-				direction == GrabberDirection.CLOSE)
-			okToMove = true;
-			
-		if (okToMove)
+//		_leftBreakerState = IsLeftBreakerClosed();
+//		_rightBreakerState = IsRightBreakerClosed();
+//		
+//		if (_leftBreakerState == BREAKEROPEN && _rightBreakerState == BREAKEROPEN)
+//			okToMove = true;
+//		if (_leftBreakerState == BREAKERCLOSED && _rightBreakerState == BREAKEROPEN)
+//				//&& direction == GrabberDirection.CLOSE)
+//			okToMove = true;
+//		if (_leftBreakerState == BREAKEROPEN && _rightBreakerState == BREAKERCLOSED)
+//				//&& direction == GrabberDirection.OPEN)
+//			okToMove = true;
+//			
+//		if (okToMove)
 			_openCloseMotor.set(speed);
 		
 	}
 
-	public boolean IsDone()
-	{
-		boolean leftBreakerCurrentState = IsLeftBreakerClosed();
-		boolean rightBreakerCurrentState = IsRightBreakerClosed();
-		boolean isDone = false;
-		
-		if (_leftBreakerState == BREAKEROPEN && leftBreakerCurrentState == BREAKERCLOSED)
-		{
-			System.out.println("left tripped");
-			_leftBreakerState = BREAKERCLOSED;
-			isDone = true;
-		}
-			
-		if (_rightBreakerState == BREAKEROPEN && rightBreakerCurrentState == BREAKERCLOSED)
-		{
-			System.out.println("right tripped");
-			_rightBreakerState = BREAKERCLOSED;
-			isDone = true;
-		}
-			
-		return isDone;
-	}
+//	public boolean IsDone()
+//	{
+//		boolean leftBreakerCurrentState = IsLeftBreakerClosed();
+//		boolean rightBreakerCurrentState = IsRightBreakerClosed();
+//		boolean isDone = false;
+//		
+//		if (_leftBreakerState == BREAKEROPEN && leftBreakerCurrentState == BREAKERCLOSED)
+//		{
+//			System.out.println("left tripped");
+//			_leftBreakerState = BREAKERCLOSED;
+//			isDone = true;
+//		}
+//			
+//		if (_rightBreakerState == BREAKEROPEN && rightBreakerCurrentState == BREAKERCLOSED)
+//		{
+//			System.out.println("right tripped");
+//			_rightBreakerState = BREAKERCLOSED;
+//			isDone = true;
+//		}
+//			
+//		return isDone;
+//	}
 	
 		
 	public void StopOpenCloseActuation()

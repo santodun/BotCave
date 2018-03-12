@@ -2,6 +2,7 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc.team1289.robot.subsystems.Elevator;
+import org.usfirst.frc.team1289.robot.OperatingParameters;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -12,12 +13,14 @@ public class ElevateViaStick extends Command {
 
 	private Elevator _elevator;
 	private Joystick _stick;
+	private OperatingParameters _parameters;
 	private Timer _timer;
 	
-    public ElevateViaStick(Elevator elevator, Joystick stick) 
+    public ElevateViaStick(Elevator elevator, Joystick stick, OperatingParameters parameters) 
     {
     	_elevator = elevator;
     	_stick = stick;
+    	_parameters = parameters;
     	_timer = new Timer();
     }
 
@@ -34,17 +37,9 @@ public class ElevateViaStick extends Command {
     {
     	double speed = -_stick.getY();
     	boolean atUpperLimit = false;
-    	//System.out.println(_timer.getMatchTime());
-    	//System.out.println(_timer.get());
-    	
-    	if (_timer.get() < 20.0)
-    	//if (_timer.getMatchTime() < 2.25) // 2:15 - ie :15sec left in the match
-    		atUpperLimit = _elevator.IsAtSwitch();
-    	else
-    		atUpperLimit = _elevator.IsAtMax();
-    	
-    	//System.out.println(speed);
-    	if (atUpperLimit && speed > 0)
+    	double elevatorSpeedThreshold = _parameters.ElevatorThresholdSpeed();
+    
+    	if (_elevator.IsAtMax() && speed > 0)
     	{
     		_elevator.Stop();
     		return;
@@ -54,6 +49,12 @@ public class ElevateViaStick extends Command {
     		_elevator.Stop();
     		return;
     	}
+    	
+    	if (speed < - elevatorSpeedThreshold)
+    		speed = -1.0;
+    	else if (speed > elevatorSpeedThreshold)
+    		speed = 1.0;
+    	else speed = speed;
     	
     	_elevator.Move(speed);  
     }
