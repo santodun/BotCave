@@ -13,16 +13,19 @@ public class AutoSideTarget extends CommandGroup
 	    		ElevatorPosition elevatorPosition, OperatingParameters operatingParameters, Grabber grabber,
 	    		Retractor retractor) 
 	    {
-	    	int heading = 10; //operatingParameters.AutoCenterRotate();
+	    	int heading = operatingParameters.AutoSideInitialHeading();
+	    	int arc = operatingParameters.AutoSideFinalHeading();
 	    	RotationDirection secondRotationDirection;
 	    	double speed = operatingParameters.AutoSpeed();
-	    	double firstLastLegDistance = 12.0; //operatingParameters.AutoCenterFirstLastLegDistance();
-	    	double middleLegDistance = 370.0; //operatingParameters.AutoCenterMiddleLegDistance();
+	    	double firstLastLegDistance = operatingParameters.AutoSideFirstDistance();
+	    	double middleLegDistance = operatingParameters.AutoSideMiddleDistance();
+	    	double lastLegDistance = operatingParameters.AutoSideFinalLegDistance();
 	    	
 	    	if (initialDirection == RotationDirection.CLOCKWISE)
 	    	{
 	    		secondRotationDirection = RotationDirection.COUNTERCLOCKWISE;
 	    		System.out.println("initial clockwise");
+	    		arc = - arc;
 	    	}
 	    	else
 	    	{
@@ -32,15 +35,13 @@ public class AutoSideTarget extends CommandGroup
 	    	}
 	    	
 	    		
-	    	addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN, operatingParameters));
-	    	addSequential(new DriveToDistance(dt, speed, firstLastLegDistance));
-	    	addSequential(new Rotate(dt, initialDirection, heading));
-	    	//addSequential(new DriveAndLift(dt, elevator, elevatorPosition, speed, middleLegDistance, operatingParameters));
-	    	addSequential(new DriveToDistance(dt, speed, middleLegDistance));
-	    	addSequential(new Rotate(dt, secondRotationDirection, - (5 + heading + operatingParameters.DriveTrainRotationArc())));//- heading));
-	    	addSequential(new DriveToDistance(dt, speed, 20.0));
-	    	addSequential(new ElevatorAutoCommand(elevator, elevatorPosition, operatingParameters));
-	    	addSequential(new GrabberCommand(grabber, GrabberDirection.OPEN));
+	    	//addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN, operatingParameters));
+	    	//addSequential(new DriveToDistance(dt, speed, firstLastLegDistance));
+	    	//addSequential(new Rotate(dt, initialDirection, heading));
+	    	addSequential(new DriveAndLift(dt, elevator, elevatorPosition, speed, middleLegDistance, operatingParameters));
+	    	//addSequential(new Rotate(dt, secondRotationDirection, arc));//- heading));
+	    	//addSequential(new DriveToDistance(dt, speed, lastLegDistance));
+	    	//addSequential(new GrabberCommand(grabber, GrabberDirection.SPEW, operatingParameters));
 	    	
 //	public AutoSideTarget(DriveTrain driveTrain, Elevator elevator,	ElevatorPosition elevatorPosition,  
 //							RotationDirection rotateDirection,  OperatingParameters operatingParameters,

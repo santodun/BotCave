@@ -36,7 +36,7 @@ public class ElevateViaStick extends Command {
     protected void execute() 
     {
     	double speed = -_stick.getY();
-    	boolean atUpperLimit = false;
+    //	boolean atUpperLimit = false;
     	double elevatorSpeedThreshold = _parameters.ElevatorThresholdSpeed();
     
     	if (_elevator.IsAtMax() && speed > 0)

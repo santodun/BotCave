@@ -12,7 +12,7 @@ public class ActuateRetractor extends Command
 {
 	private Retractor _retractor;
 	private Timer _timer;
-	private boolean _isDone = false;
+	//private boolean _isDone = false;
 	private RetractorDirection _direction;
 	double _speed;
 	

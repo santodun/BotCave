@@ -12,8 +12,8 @@ import org.usfirst.frc.team1289.robot.RobotMap;
 import org.usfirst.frc.team1289.robot.commands.*;
 import org.usfirst.frc.team1289.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Joystick;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Counter;
@@ -41,7 +41,8 @@ public class Robot extends IterativeRobot {
 	
 	private static Talon _retractorMotor;
 	private static Talon _elevatorMotor;	
-	private static Talon _grabberMotor;
+	private static Talon _grabberLeftMotor;
+	private static Talon _grabberRightMotor;
 	private static Talon _leftFrontMotor;
 	private static Talon _rightFrontMotor;
 	private static Talon _leftRearMotor;
@@ -52,8 +53,8 @@ public class Robot extends IterativeRobot {
 	private static DigitalInput _elevatorMinBreaker;		
 	private static DigitalInput _elevatorScaleBreaker;				
 	private static DigitalInput _elevatorSwitchBreaker;
-	private static DigitalInput _grabberBreakerLeft;
-	private static DigitalInput _grabberBreakerRight;
+//	private static DigitalInput _grabberBreakerLeft;
+//	private static DigitalInput _grabberBreakerRight;
 	private static DigitalInput _retractorBreaker;
 	private static Counter _leftEncoder;
 	private static Counter _rightEncoder;
@@ -66,8 +67,8 @@ public class Robot extends IterativeRobot {
 	public static Joystick _driveJoyStick;
 	public static Joystick _elevatorJoyStick;
 	public static Joystick _buttonStation;
-	public static JoystickButton _grabberOpenButton;
-	public static JoystickButton _grabberCloseButton;
+	public static JoystickButton _grabberIngestButton;
+	public static JoystickButton _grabberSpewButton;
 	public static JoystickButton _retractGrabberButton;
 	public static JoystickButton _deployGrabberButton;
 	public static JoystickButton _halfSpeedButton;
@@ -88,8 +89,8 @@ public class Robot extends IterativeRobot {
     	_elevatorJoyStick = new Joystick(_ioMap.IO_ElevatorJoystick);
 	    _buttonStation = new Joystick(_ioMap.IO_ButtonStation);
 	   
-	    _grabberOpenButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberOpenButton);
-	    _grabberCloseButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberCloseButton);
+	    _grabberIngestButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberIngestButton);
+	    _grabberSpewButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_GrabberSpewButton);
 	    _retractGrabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_RetractorRetractButton);
 	    _deployGrabberButton = new JoystickButton(_elevatorJoyStick, _ioMap.IO_RetractorDeployButton);
 	    _halfSpeedButton = new JoystickButton(_driveJoyStick, _ioMap.IO_HalfSpeedButton);
@@ -104,9 +105,10 @@ public class Robot extends IterativeRobot {
     	_retractorBreaker = new DigitalInput(_ioMap.DIO_RetractorBreaker);
       	_driveTrainRangeFinder = new RangeFinder(_ioMap.AIO_DriveTrainRangeFinder);
        	_gyro = new AnalogGyro(_ioMap.AIO_Gyroscope);
-       	_grabberMotor = new Talon(_ioMap.PWM_grabberOpenCloseMotor);
-       	_grabberBreakerLeft = new DigitalInput(_ioMap.DIO_grabberBreakerLeft);
-       	_grabberBreakerRight = new DigitalInput(_ioMap.DIO_grabberBreakerRight);
+       	_grabberLeftMotor = new Talon(_ioMap.PWM_grabberLeftMotor);
+       	_grabberRightMotor = new Talon(_ioMap.PWM_grabberRightMotor);
+//       	_grabberBreakerLeft = new DigitalInput(_ioMap.DIO_grabberBreakerLeft);
+//       	_grabberBreakerRight = new DigitalInput(_ioMap.DIO_grabberBreakerRight);
        	_leftFrontMotor = new Talon(_ioMap.PWM_leftFrontMotor);
        	_rightFrontMotor = new Talon(_ioMap.PWM_rightFrontMotor);
        	_leftRearMotor = new Talon(_ioMap.PWM_leftRearMotor);
@@ -119,22 +121,27 @@ public class Robot extends IterativeRobot {
 				_leftEncoder, _rightEncoder, _gyro, _driveTrainRangeFinder, _driveJoyStick, _operatingParameters);
     	_elevator = new Elevator(_elevatorMotor, _elevatorMaxBreaker, _elevatorMinBreaker, _elevatorScaleBreaker, _elevatorSwitchBreaker);
     	
-    	_grabber = new Grabber(_grabberMotor, _grabberBreakerLeft, _grabberBreakerRight, _operatingParameters);
+    	_grabber = new Grabber(_grabberLeftMotor, _grabberRightMotor, /*_grabberBreakerLeft, _grabberBreakerRight,*/ _operatingParameters);
     	_retractor = new Retractor(_retractorMotor, _retractorBreaker);
     	_camera = new Camera();
     	_camera.Start();
     	
     	// Commands
-    	_testCommand = new TestCommand(_grabberMotor);
+    	//_testCommand = new TestCommand(_grabberMotor);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain, _halfSpeedButton);	
     	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick, _operatingParameters);
     	//_grabberCommand = new GrabberCommand(_grabber);
     	
-    	_grabberOpenButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.OPEN));
-    	_grabberCloseButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.CLOSE));
+    	_grabberIngestButton.whileHeld(new GrabberCommand(_grabber, GrabberDirection.INGEST, _operatingParameters));
+    	_grabberSpewButton.whenPressed(new GrabberCommand(_grabber, GrabberDirection.SPEW, _operatingParameters));
     	_retractGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.UP, _operatingParameters));
     	_deployGrabberButton.whenPressed(new ActuateRetractor(_retractor, RetractorDirection.DOWN, _operatingParameters));
     	
+//    	_grabberOpenButton.whenPressed(new TestCommand("Grabber Open"));
+//    	_grabberCloseButton.whenPressed(new TestCommand("Grabber Close"));
+//    	_retractGrabberButton.whenPressed(new TestCommand("Retract"));
+//    	_deployGrabberButton.whenPressed(new TestCommand("Deploy"));
+//    	
 		chooser = new SendableChooser();
     //    chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
@@ -168,6 +175,7 @@ public class Robot extends IterativeRobot {
     public void autonomousInit() {
         _autoCommand =  GetAutoModeCommand();
         System.out.printf("%s\n", _autoCommand.getName());
+        System.out.println(_operatingParameters.TestString());
                 
 //        System.out.printf("%s %s\n", position, gameData);
         

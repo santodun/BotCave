@@ -3,7 +3,7 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc.team1289.robot.subsystems.DriveTrain;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveToDistance extends Command {
 	private double _speed;
@@ -21,6 +21,8 @@ public class DriveToDistance extends Command {
     protected void initialize() 
     {
     	_driveTrain.Reset();
+    	_driveTrain.InitEncoderPID(_distance);
+    	System.out.println("D2D init");
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -32,19 +34,21 @@ public class DriveToDistance extends Command {
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-		double leftFrontDistance = _driveTrain.GetLeftFrontEncoderDistance();
-		double rightFrontDistance = _driveTrain.GetRightFrontEncoderDistance();
-		double averageDistance = Math.abs((leftFrontDistance + rightFrontDistance) / 2.0 );
-		System.out.printf("%f %f %f\n", leftFrontDistance, rightFrontDistance, averageDistance);
-		//averageDistance = leftFrontDistance;
-		if (averageDistance < _distance)
-			return false;
-		else
-		{
-			System.out.println("D2D done");
-			System.out.flush();
-			return true;
-		}
+    	return _driveTrain.EncoderPIDAtTarget();
+    	
+//		double leftFrontDistance = _driveTrain.GetLeftFrontEncoderDistance();
+//		double rightFrontDistance = _driveTrain.GetRightFrontEncoderDistance();
+//		double averageDistance = Math.abs((leftFrontDistance + rightFrontDistance) / 2.0 );
+//		System.out.printf("%f %f %f\n", leftFrontDistance, rightFrontDistance, averageDistance);
+//		//averageDistance = leftFrontDistance;
+//		if (averageDistance < _distance)
+//			return false;
+//		else
+//		{
+//			System.out.println("D2D done");
+//			System.out.flush();
+//			return true;
+//		}
     }
 
     // Called once after isFinished returns true

@@ -15,7 +15,7 @@ public class AutoToLine extends CommandGroup {
 
     public AutoToLine(DriveTrain dt, OperatingParameters operatingParameters, Grabber grabber, Retractor retractor) 
     {
-    	addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN, operatingParameters));
+    	//addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN, operatingParameters));
     	addSequential(new DriveToDistance(dt, operatingParameters.AutoSpeed(), operatingParameters.AutoLineDistance()));
 
     }

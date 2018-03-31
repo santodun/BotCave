@@ -3,8 +3,8 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc.team1289.robot.subsystems.DriveTrain;
-import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveUntilDistance extends Command {
 	private double _speed = 0.2;

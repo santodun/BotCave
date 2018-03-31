@@ -2,15 +2,17 @@
 package org.usfirst.frc.team1289.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.Talon;
 
-import org.usfirst.frc.team1289.robot.Robot;
+//import org.usfirst.frc.team1289.robot.Robot;
 import org.usfirst.frc.team1289.robot.OperatingParameters;
 import org.usfirst.frc.team1289.robot.commands.*;
 
@@ -31,22 +33,27 @@ public class DriveTrain extends PIDSubsystem
 	private static SpeedController _leftRearMotor;
 	private static SpeedController _rightRearMotor;
 	private static SpeedControllerGroup _leftMotors, _rightMotors;
+	private static Talon _dummyMotor1 = new Talon(10);
+	private static Talon _dummyMotor2 = new Talon(11);
 	private static Counter _leftFrontEncoder;
 	private static Counter _rightFrontEncoder; 
-	private static Counter _leftRearEncoder;
-	private static Counter _rightRearEncoder; 
+	//private static Counter _leftRearEncoder;
+	//private static Counter _rightRearEncoder; 
 	private static DifferentialDrive _robotDrive;
 	private static Joystick _joystick;
 	private static OperatingParameters _parameters;
 	private static RangeFinder _rangeFinder;
 	private static AnalogGyro _gyro;
 	private static double _pidOutput;
+	
+	private static PIDController _encoderPID;
+	private static PIDController _rotatePID;
 		
 	public DriveTrain(SpeedController leftFront, SpeedController rightFront, SpeedController leftRear, SpeedController rightRear,
 						Counter leftEncoder, Counter rightEncoder, AnalogGyro gyro, RangeFinder rangeFinder,
 						Joystick joystick, OperatingParameters parameters)
 	{		
-		super("DriveTrain", parameters.DriveTrainPIDProportion(), parameters.DriveTrainPIDIntegral(), parameters.DriveTrainPIDDerivative());
+		super("DriveTrain", parameters.DT_DriveStraightPGain(), parameters.DT_DriveStraightIGain(), parameters.DT_DriveStraightDGain());
 	// System.out.println(parameters.DriveTrainPIDProportion());
 		_leftFrontMotor = leftFront;
 		_leftRearMotor = leftRear;
@@ -90,8 +97,51 @@ public class DriveTrain extends PIDSubsystem
 		setOutputRange(-0.1, 0.1);
 		getPIDController().setContinuous(true);
 		enable();
+		
+		_encoderPID = new PIDController(parameters.DT_DriveDistancePGain(), parameters.DT_DriveDistanceIGain(), parameters.DT_DriveDistanceDGain(), _leftFrontEncoder, _dummyMotor1);
+		_rotatePID = new PIDController(parameters.DT_RotatePGain(), parameters.DT_RotateIGain(), parameters.DT_RotateDGain(), _gyro, _dummyMotor2);
 	}
-	   
+	 
+	public void InitEncoderPID(double distance)
+	{
+		if (! _encoderPID.isEnabled())
+		{
+			//System.out.printf("InitEncoderPID %f\n", distance);
+			_encoderPID.setSetpoint(distance);
+			_encoderPID.setAbsoluteTolerance(5.0);
+			_encoderPID.setInputRange(0.0, 500.0);
+			_encoderPID.setOutputRange(-0.4, 0.4);
+			_encoderPID.setContinuous(true);
+			_leftFrontEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
+			_encoderPID.enable();
+		}
+	}
+
+	public void InitRotatePID(int heading)
+	{
+		if (! _rotatePID.isEnabled())
+		{
+			_rotatePID.setSetpoint(heading);
+			_rotatePID.setAbsoluteTolerance(0.5);
+			_rotatePID.setInputRange(-100.0, 100.0);
+			_rotatePID.setOutputRange(-0.4, 0.4);
+			_rotatePID.setContinuous(true);
+			_gyro.setPIDSourceType(PIDSourceType.kDisplacement);
+			_rotatePID.enable();
+		}
+	}
+	
+	public boolean EncoderPIDAtTarget()
+	{
+		return _encoderPID.onTarget();
+	}
+	
+	public boolean RotatePIDAtTarget()
+	{
+		return _rotatePID.onTarget();
+	}
+	
+	
 	@Override
 	 protected double returnPIDInput()
 	 {
@@ -120,19 +170,23 @@ public class DriveTrain extends PIDSubsystem
     public void Move(double speed)
     {
     	boolean squareInputs = false; 
-    	_robotDrive.arcadeDrive(speed, _pidOutput, squareInputs);
+    	System.out.printf("Dt move %d %f\n", _leftFrontEncoder.get(), _encoderPID.get());
+    	_robotDrive.arcadeDrive(_encoderPID.get(), _pidOutput, squareInputs);
     }
     
     public void Rotate(RotationDirection direction)
     {
-    	double speed = _parameters.RotationSpeed();
-    	double rotate = _parameters.RotateRotation();
+//    	double speed = _parameters.RotationSpeed();
+//    	double rotate = _parameters.RotateRotation();
+    //	System.out.printf("Rotate %f\n",  _gyro.getAngle());
+//    	
+    	_robotDrive.arcadeDrive(0.0,  _rotatePID.get(), false);
     	
-    	//System.out.printf("%f, %f\n",  speed, rotate);
-    	if (direction == RotationDirection.CLOCKWISE)
-    		_robotDrive.arcadeDrive(speed, rotate, false);
-    	else
-    		_robotDrive.arcadeDrive(-speed, -rotate, false);
+//    	//System.out.printf("%f, %f\n",  speed, rotate);
+//    	if (direction == RotationDirection.CLOCKWISE)
+//    		_robotDrive.arcadeDrive(speed, rotate, false);
+//    	else
+//    		_robotDrive.arcadeDrive(-speed, -rotate, false);
     }
     
     public double GetHeading()
@@ -160,7 +214,10 @@ public class DriveTrain extends PIDSubsystem
     	rotateValue = ScaleValue(rotateValue);
     	
     	if (halfSpeedMode)
+    	{
     		moveValue = moveValue * 0.5;
+    		rotateValue = rotateValue * 0.9;
+    	}
     	
     	_robotDrive.arcadeDrive(moveValue, rotateValue);
     }
@@ -206,6 +263,12 @@ public class DriveTrain extends PIDSubsystem
 	   _leftFrontEncoder.reset();
 	   _rightFrontEncoder.reset();
 	   _gyro.reset();
+	   
+	   if (_encoderPID.isEnabled())
+		   _encoderPID.disable();
+		
+	   if (_rotatePID.isEnabled())
+		   _rotatePID.disable();
    }
 }
 

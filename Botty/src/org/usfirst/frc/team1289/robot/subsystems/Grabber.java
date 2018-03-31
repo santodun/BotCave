@@ -2,8 +2,9 @@ package org.usfirst.frc.team1289.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.Talon;
+//import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import org.usfirst.frc.team1289.robot.OperatingParameters;
 import org.usfirst.frc.team1289.robot.commands.GrabberDirection;
 
@@ -15,48 +16,85 @@ import org.usfirst.frc.team1289.robot.commands.GrabberDirection;
 public class Grabber extends Subsystem
 {
 	private static OperatingParameters _parameters;
-	private static SpeedController _openCloseMotor;
-	private static DigitalInput _leftBreaker;
-	private static DigitalInput _rightBreaker;
-	private static boolean _leftBreakerState;
-	private static boolean _rightBreakerState;
-	private static final boolean BREAKERCLOSED = true;
-	private static final boolean BREAKEROPEN = false;
-		
-	public Grabber(SpeedController openCloseMotor, DigitalInput leftBreaker, DigitalInput rightBreaker, OperatingParameters parameters)
+	private static SpeedController _leftMotor;
+	private static SpeedController _rightMotor;
+//	private static DigitalInput _leftBreaker;
+//	private static DigitalInput _rightBreaker;
+	private static Timer _timer;
+//	private static boolean _leftBreakerState;
+//	private static boolean _rightBreakerState;
+//	private static final boolean BREAKERCLOSED = true;
+//	private static final boolean BREAKEROPEN = false;
+//		
+	public Grabber(SpeedController leftMotor, SpeedController rightMotor, /*DigitalInput leftBreaker, DigitalInput rightBreaker,*/ OperatingParameters parameters)
 	{
-		_openCloseMotor  = openCloseMotor;
-		_leftBreaker = leftBreaker;
-		_rightBreaker = rightBreaker;
+		_leftMotor  = leftMotor;
+		_rightMotor  = rightMotor;
+//		_leftBreaker = leftBreaker;
+//		_rightBreaker = rightBreaker;
 		_parameters = parameters;
+		_timer = new Timer();
 		
 		StopAllMotors();
-		_leftBreakerState = IsLeftBreakerClosed();
-		_rightBreakerState = IsRightBreakerClosed();
+//		_leftBreakerState = IsLeftBreakerClosed();
+//		_rightBreakerState = IsRightBreakerClosed();
 	}
 	
-	public boolean IsLeftBreakerClosed()
-	{
-		return ! _leftBreaker.get();
-	}
+//	public boolean IsLeftBreakerClosed()
+//	{
+//		boolean breakerState = ! _leftBreaker.get();
+//	
+//		if (breakerState == BREAKERCLOSED)
+//		{
+//			_timer.reset();
+//			_timer.start();
+//			_timer.delay(0.001); // 1ms
+//			breakerState = ! _leftBreaker.get();
+//		}
+//		return breakerState;
+		
+//		return ! _leftBreaker.get();
+//	}
 
-	public boolean IsRightBreakerClosed()
-	{
-		return ! _rightBreaker.get();
-	}
+//	public boolean IsRightBreakerClosed()
+//	{
+//		boolean breakerState = ! _rightBreaker.get();
+//		
+//		if (breakerState == BREAKERCLOSED)
+//		{
+//			_timer.reset();
+//			_timer.start();
+//			_timer.delay(0.001); // 1ms
+//			breakerState = ! _rightBreaker.get();
+//		}
+//		return breakerState;
+	
+//		return ! _rightBreaker.get();
+//	}
 	
 	public void StopAllMotors()
 	{
-		_openCloseMotor.stopMotor();
+		_leftMotor.stopMotor();
+		_rightMotor.stopMotor();
 	}
 
 	public void ActuateGrabber(GrabberDirection direction)
 	{		
-		boolean okToMove = false;
+		//boolean okToMove = false;
 		
 		double speed = _parameters.GrabberSpeed();
-		if (direction == GrabberDirection.CLOSE)
-			speed = - speed;
+		double leftSpeed, rightSpeed;
+		
+		if (direction == GrabberDirection.INGEST)
+		{
+			leftSpeed = - speed;
+			rightSpeed = speed;
+		} 
+		else
+		{
+			leftSpeed = speed;
+			rightSpeed = - speed;
+		}
 		
 //		_leftBreakerState = IsLeftBreakerClosed();
 //		_rightBreakerState = IsRightBreakerClosed();
@@ -71,8 +109,8 @@ public class Grabber extends Subsystem
 //			okToMove = true;
 //			
 //		if (okToMove)
-			_openCloseMotor.set(speed);
-		
+			_leftMotor.set(leftSpeed);
+			_rightMotor.set(rightSpeed);
 	}
 
 //	public boolean IsDone()
@@ -101,7 +139,8 @@ public class Grabber extends Subsystem
 		
 	public void StopOpenCloseActuation()
 	{
-		_openCloseMotor.stopMotor();
+		_leftMotor.stopMotor();
+		_rightMotor.stopMotor();
 	}
 	
 	

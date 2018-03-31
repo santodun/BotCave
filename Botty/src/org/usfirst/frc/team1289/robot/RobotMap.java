@@ -12,13 +12,14 @@ public class RobotMap {
 	public static final int PWM_leftRearMotor = 2;
 	public static final int PWM_rightRearMotor = 3;
 	public static final int PWM_elevatorMotor = 4;
-	public static final int PWM_grabberOpenCloseMotor = 5;
+	public static final int PWM_grabberLeftMotor = 5;
 	public static final int PWM_retractorMotor = 6;
+	public static final int PWM_grabberRightMotor = 7;
 	
 	public static final int DIO_leftEncoder = 0;
 	public static final int DIO_rightEncoder = 1;
-	public static final int DIO_grabberBreakerLeft = 2;
-	public static final int DIO_grabberBreakerRight = 3;
+//	public static final int DIO_grabberBreakerLeft = 2;  //port1
+//	public static final int DIO_grabberBreakerRight = 3; //port2
 	public static final int DIO_ElevatorMaxBreaker = 4;
 	public static final int DIO_ElevatorMinBreaker = 5;
 	public static final int DIO_ElevatorSwitchBreaker = 6;
@@ -29,8 +30,8 @@ public class RobotMap {
 	public static final int IO_DriveJoystick = 0;
 	public static final int IO_ElevatorJoystick = 1;
 	
-	public static final int IO_GrabberCloseButton = 1;
-	public static final int IO_GrabberOpenButton = 2;
+	public static final int IO_GrabberIngestButton = 1;
+	public static final int IO_GrabberSpewButton = 2;
 	public static final int IO_RetractorRetractButton = 3;
 	public static final int IO_RetractorDeployButton = 4;
 	public static final int IO_HalfSpeedButton = 1;
@@ -39,3 +40,4 @@ public class RobotMap {
 	public static final int AIO_DriveTrainRangeFinder = 1;
 }
 	
+
