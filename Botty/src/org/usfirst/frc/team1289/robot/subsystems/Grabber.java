@@ -34,7 +34,7 @@ public class Grabber extends Subsystem
 //		_rightBreaker = rightBreaker;
 		_parameters = parameters;
 		_timer = new Timer();
-		
+		System.out.println("new grabber subsystem");
 		StopAllMotors();
 //		_leftBreakerState = IsLeftBreakerClosed();
 //		_rightBreakerState = IsRightBreakerClosed();
@@ -74,6 +74,7 @@ public class Grabber extends Subsystem
 	
 	public void StopAllMotors()
 	{
+		System.out.println("stopping motors");
 		_leftMotor.stopMotor();
 		_rightMotor.stopMotor();
 	}
@@ -87,13 +88,13 @@ public class Grabber extends Subsystem
 		
 		if (direction == GrabberDirection.INGEST)
 		{
-			leftSpeed = - speed;
-			rightSpeed = speed;
+			leftSpeed = speed;
+			rightSpeed = - speed;
 		} 
 		else
 		{
-			leftSpeed = speed;
-			rightSpeed = - speed;
+			leftSpeed = - speed;
+			rightSpeed = speed;
 		}
 		
 //		_leftBreakerState = IsLeftBreakerClosed();

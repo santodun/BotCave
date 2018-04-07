@@ -35,13 +35,13 @@ public class AutoSideTarget extends CommandGroup
 	    	}
 	    	
 	    		
-	    	//addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN, operatingParameters));
-	    	//addSequential(new DriveToDistance(dt, speed, firstLastLegDistance));
-	    	//addSequential(new Rotate(dt, initialDirection, heading));
+	    	addSequential(new ActuateRetractor(retractor, RetractorDirection.DOWN, operatingParameters));
+	    	addSequential(new DriveToDistance(dt, speed, firstLastLegDistance));
+	    	addSequential(new Rotate(dt, initialDirection, heading));
 	    	addSequential(new DriveAndLift(dt, elevator, elevatorPosition, speed, middleLegDistance, operatingParameters));
-	    	//addSequential(new Rotate(dt, secondRotationDirection, arc));//- heading));
-	    	//addSequential(new DriveToDistance(dt, speed, lastLegDistance));
-	    	//addSequential(new GrabberCommand(grabber, GrabberDirection.SPEW, operatingParameters));
+	    	addSequential(new Rotate(dt, secondRotationDirection, arc));//- heading));
+	    	addSequential(new DriveToDistance(dt, speed, lastLegDistance));
+	    	addSequential(new GrabberCommand(grabber, GrabberDirection.SPEW, operatingParameters));
 	    	
 //	public AutoSideTarget(DriveTrain driveTrain, Elevator elevator,	ElevatorPosition elevatorPosition,  
 //							RotationDirection rotateDirection,  OperatingParameters operatingParameters,
