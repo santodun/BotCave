@@ -2,6 +2,9 @@ package org.usfirst.frc.team1289.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.usfirst.frc.team1289.robot.subsystems.Elevator;
+import org.usfirst.frc.team1289.robot.subsystems.ElevatorPosition;
+import org.usfirst.frc.team1289.robot.subsystems.Lighting;
+import org.usfirst.frc.team1289.robot.subsystems.LightingColor;
 import org.usfirst.frc.team1289.robot.OperatingParameters;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
@@ -13,14 +16,16 @@ public class ElevateViaStick extends Command {
 
 	private Elevator _elevator;
 	private Joystick _stick;
+	private Lighting _lighting;
 	private OperatingParameters _parameters;
 	private Timer _timer;
 	
-    public ElevateViaStick(Elevator elevator, Joystick stick, OperatingParameters parameters) 
+    public ElevateViaStick(Elevator elevator, Joystick stick, Lighting lighting, OperatingParameters parameters) 
     {
     	_elevator = elevator;
     	_stick = stick;
     	_parameters = parameters;
+    	_lighting = lighting;
     	_timer = new Timer();
     }
 
@@ -30,6 +35,8 @@ public class ElevateViaStick extends Command {
     	_elevator.Stop();
     	_timer.reset();
     	_timer.start();
+    	
+    	_lighting.SetColor(LightingColor.RED);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -55,6 +62,16 @@ public class ElevateViaStick extends Command {
     	else if (speed > elevatorSpeedThreshold)
     		speed = 1.0;
     	else speed = speed;
+    	
+    	// will turn color if above switch and reverse direction to go down
+    	// or if below and reverse direction to go up
+    	// how to avoid needing to know context?
+    	if (_elevator.LastKnownPosition() == ElevatorPosition.ABOVESWITCH)
+    		_lighting.SetColor(LightingColor.GREEN);
+    	else if (_elevator.LastKnownPosition() == ElevatorPosition.BELOWSWITCH)
+    		_lighting.SetColor(LightingColor.RED);
+    	else
+    		_lighting.SetColor(LightingColor.BLUE);
     	
     	_elevator.Move(speed);  
     }

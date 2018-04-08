@@ -4,6 +4,7 @@ package org.usfirst.frc.team1289.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -37,6 +38,7 @@ public class Robot extends IterativeRobot {
 	private static Grabber _grabber;
 	private static Elevator _elevator;
 	private static Retractor _retractor;
+	private static Lighting _lighting;
 	public static Camera _camera;
 	
 	private static Talon _retractorMotor;
@@ -58,7 +60,10 @@ public class Robot extends IterativeRobot {
 	private static DigitalInput _retractorBreaker;
 	private static Counter _leftEncoder;
 	private static Counter _rightEncoder;
-	
+	private static PWM _redLEDs;
+	private static PWM _greenLEDs;
+	private static PWM _blueLEDs;
+		
 	private static Command _testCommand;
 	private static Command _driveViaStickCommand;
 	private static Command _elevateViaStickCommand;
@@ -115,6 +120,9 @@ public class Robot extends IterativeRobot {
        	_rightRearMotor = new Talon(_ioMap.PWM_rightRearMotor);
        	_leftEncoder = new Counter(_ioMap.DIO_leftEncoder);
        	_rightEncoder = new Counter(_ioMap.DIO_rightEncoder);
+       	_redLEDs = new PWM(_ioMap.PWM_redLEDs);
+       	_greenLEDs = new PWM(_ioMap.PWM_greenLEDs);
+       	_blueLEDs = new PWM(_ioMap.PWM_blueLEDs);
        	
        	// Subsystems
     	_driveTrain = new DriveTrain(_leftFrontMotor, _rightFrontMotor, _leftRearMotor, _rightRearMotor,
@@ -123,13 +131,14 @@ public class Robot extends IterativeRobot {
     	
     	_grabber = new Grabber(_grabberLeftMotor, _grabberRightMotor, /*_grabberBreakerLeft, _grabberBreakerRight,*/ _operatingParameters);
     	_retractor = new Retractor(_retractorMotor, _retractorBreaker);
+    	_lighting = new Lighting(_redLEDs, _greenLEDs, _blueLEDs);
     	_camera = new Camera();
     	_camera.Start();
     	
     	// Commands
     	//_testCommand = new TestCommand(_grabberMotor);
     	_driveViaStickCommand = new DriveViaStick(_driveTrain, _halfSpeedButton);	
-    	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick, _operatingParameters);
+    	_elevateViaStickCommand = new ElevateViaStick(_elevator, _elevatorJoyStick, _lighting, _operatingParameters);
     	//_grabberCommand = new GrabberCommand(_grabber);
     	
     	_grabberIngestButton.whileHeld(new GrabberCommand(_grabber, GrabberDirection.INGEST, _operatingParameters));

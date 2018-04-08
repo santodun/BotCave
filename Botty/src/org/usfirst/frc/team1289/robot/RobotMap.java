@@ -15,6 +15,11 @@ public class RobotMap {
 	public static final int PWM_grabberLeftMotor = 5;
 	public static final int PWM_retractorMotor = 6;
 	public static final int PWM_grabberRightMotor = 7;
+	public static final int PWM_redLEDs = 8;
+	public static final int PWM_greenLEDs = 9;
+	public static final int PWM_blueLEDs = 10; // fake - really doesn't exist - no expansion board available
+	
+	
 	
 	public static final int DIO_leftEncoder = 0;
 	public static final int DIO_rightEncoder = 1;
