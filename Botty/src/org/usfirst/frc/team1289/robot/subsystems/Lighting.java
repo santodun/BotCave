@@ -2,62 +2,48 @@ package org.usfirst.frc.team1289.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.PWM;
-import edu.wpi.first.wpilibj.PWM.PeriodMultiplier;
+import edu.wpi.first.wpilibj.SpeedController;
 
 /**
- * blue commented out as this is a fake PWM on the actual assembly, due to 
- * insufficient open PWM ports.
  */
 public class Lighting extends Subsystem 
 {
-	PWM _red;
-	PWM _blue;
-	PWM _green;
-
-	public Lighting(PWM redChannel, PWM greenChannel, PWM blueChannel)
-	{
-		_red = redChannel;
-		_green = greenChannel;
-		_blue = blueChannel;
+	SpeedController _leds;
 	
-		_red.setPeriodMultiplier(PeriodMultiplier.k1X);
-		_green.setPeriodMultiplier(PeriodMultiplier.k1X);
-		//_blue.setPeriodMultiplier(PeriodMultiplier.k1X);
+	public Lighting(SpeedController leds)
+	{
+		_leds = leds;
 	}
 	
 	public void SetColor(LightingColor color)
 	{
 		if (color == LightingColor.RED)
 		{
-			_red.setRaw(0xFF);
-			_green.setRaw(0x00);
-			//_blue.setRaw(0x00);
+			_leds.set(0.61);
+			
 			SmartDashboard.putBoolean("DB/LED 0", true);
 			SmartDashboard.putBoolean("DB/LED 1", false);
 			SmartDashboard.putBoolean("DB/LED 2", false);
 			
 		} else if (color == LightingColor.GREEN)
 		{
-			_red.setRaw(0x00);
-			_green.setRaw(0xFF);
-			//_blue.setRaw(0x00);
+			_leds.set(0.77);
+			
 			SmartDashboard.putBoolean("DB/LED 0", false);
 			SmartDashboard.putBoolean("DB/LED 1", true);
 			SmartDashboard.putBoolean("DB/LED 2", false);
+			
 		} else if (color == LightingColor.BLUE)
 		{
-			_red.setRaw(0x00);
-			_green.setRaw(0x00);
-			//_blue.setRaw(0xFF);
+			_leds.set(0.87);
+			
 			SmartDashboard.putBoolean("DB/LED 0", false);
 			SmartDashboard.putBoolean("DB/LED 1", false);
 			SmartDashboard.putBoolean("DB/LED 2", true);
 		} else
 		{
-			_red.setRaw(0xFF);
-			_green.setRaw(0xFF);
-			//blue.setRaw(0x00);
+			_leds.set(0.25);
+			
 			SmartDashboard.putBoolean("DB/LED 0", true);
 			SmartDashboard.putBoolean("DB/LED 1", true);
 			SmartDashboard.putBoolean("DB/LED 2", true);

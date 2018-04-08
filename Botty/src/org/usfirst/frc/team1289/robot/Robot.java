@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 //import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.*;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogGyro;
@@ -60,9 +61,7 @@ public class Robot extends IterativeRobot {
 	private static DigitalInput _retractorBreaker;
 	private static Counter _leftEncoder;
 	private static Counter _rightEncoder;
-	private static PWM _redLEDs;
-	private static PWM _greenLEDs;
-	private static PWM _blueLEDs;
+	private static Spark _leds;
 		
 	private static Command _testCommand;
 	private static Command _driveViaStickCommand;
@@ -120,9 +119,7 @@ public class Robot extends IterativeRobot {
        	_rightRearMotor = new Talon(_ioMap.PWM_rightRearMotor);
        	_leftEncoder = new Counter(_ioMap.DIO_leftEncoder);
        	_rightEncoder = new Counter(_ioMap.DIO_rightEncoder);
-       	_redLEDs = new PWM(_ioMap.PWM_redLEDs);
-       	_greenLEDs = new PWM(_ioMap.PWM_greenLEDs);
-       	_blueLEDs = new PWM(_ioMap.PWM_blueLEDs);
+       	_leds = new Spark(_ioMap.PWM_LEDs);
        	
        	// Subsystems
     	_driveTrain = new DriveTrain(_leftFrontMotor, _rightFrontMotor, _leftRearMotor, _rightRearMotor,
@@ -131,7 +128,7 @@ public class Robot extends IterativeRobot {
     	
     	_grabber = new Grabber(_grabberLeftMotor, _grabberRightMotor, /*_grabberBreakerLeft, _grabberBreakerRight,*/ _operatingParameters);
     	_retractor = new Retractor(_retractorMotor, _retractorBreaker);
-    	_lighting = new Lighting(_redLEDs, _greenLEDs, _blueLEDs);
+    	_lighting = new Lighting(_leds);
     	_camera = new Camera();
     	_camera.Start();
     	
