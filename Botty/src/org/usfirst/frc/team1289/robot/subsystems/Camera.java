@@ -30,10 +30,10 @@ public class Camera extends Subsystem {
         
         new Thread(() -> {
             UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
-            camera.setResolution(640, 480);
+            camera.setResolution(320, 240);
             
             CvSink cvSink = CameraServer.getInstance().getVideo();
-            CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+            CvSource outputStream = CameraServer.getInstance().putVideo("Blur", 320, 240);
             
             Mat source = new Mat();
             Mat output = new Mat();

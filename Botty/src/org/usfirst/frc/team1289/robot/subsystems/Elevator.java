@@ -15,7 +15,7 @@ public class Elevator extends Subsystem
 	private static DigitalInput _scaleLimit;
 	private static DigitalInput _switchLimit;
 	private static ElevatorPosition _currentPosition;
-	private static ElevatorPosition _previousPosition;
+	private static ElevatorPosition _aboveBelow;
 	private static double _speed;
 	
 	public Elevator(SpeedController motor, DigitalInput maxLimitSwitch, DigitalInput minLimitSwitch,
@@ -27,7 +27,7 @@ public class Elevator extends Subsystem
 		_switchLimit = switchLimitSwitch;
 		_scaleLimit = scaleLimitSwitch;
 		_currentPosition = ElevatorPosition.MIN;
-		_previousPosition = ElevatorPosition.MIN;
+		_aboveBelow = ElevatorPosition.BELOWSWITCH;
 		_speed = 0.0;
 		_motor.setInverted(true);
 	}
@@ -59,28 +59,7 @@ public class Elevator extends Subsystem
     
     public ElevatorPosition LastKnownPosition()
     {
-    	ElevatorPosition rtn = ElevatorPosition.BELOWSWITCH;
-    	
-    	if (_previousPosition == ElevatorPosition.MIN && _currentPosition == ElevatorPosition.MIN && _speed > 0.0)
-    			rtn = ElevatorPosition.BELOWSWITCH;
-    	else if (_previousPosition == ElevatorPosition.MIN && _currentPosition == ElevatorPosition.MIN && _speed < 0.0)
-    		rtn = ElevatorPosition.BELOWSWITCH;
-    	else if (_previousPosition == ElevatorPosition.MIN && _currentPosition == ElevatorPosition.SWITCH && _speed > 0.0)
-    		rtn = ElevatorPosition.ABOVESWITCH;
-    	else if (_previousPosition == ElevatorPosition.MIN && _currentPosition == ElevatorPosition.SWITCH && _speed < 0.0)
-    		rtn = ElevatorPosition.ABOVESWITCH;
-    	else if (_previousPosition == ElevatorPosition.SWITCH && _currentPosition == ElevatorPosition.MIN && _speed > 0.0)
-    		rtn = ElevatorPosition.BELOWSWITCH;
-    	else if (_previousPosition == ElevatorPosition.SWITCH && _currentPosition == ElevatorPosition.MIN && _speed < 0.0)
-    		rtn = ElevatorPosition.BELOWSWITCH;
-    	else if (_previousPosition == ElevatorPosition.SWITCH && _currentPosition == ElevatorPosition.SWITCH && _speed > 0.0)
-    		rtn = ElevatorPosition.ABOVESWITCH;
-    	else if (_previousPosition == ElevatorPosition.SWITCH && _currentPosition == ElevatorPosition.SWITCH && _speed < 0.0)
-    		rtn = ElevatorPosition.ABOVESWITCH;
-    	else
-    		rtn = ElevatorPosition.BELOWSWITCH;
-    	
-    	return rtn;
+    	return _aboveBelow;
     }
     
     public void Move(double speed)
@@ -99,24 +78,28 @@ public class Elevator extends Subsystem
     	
     	if (IsAtScale())
     	{	
-    		_previousPosition = _currentPosition;
     		_currentPosition = ElevatorPosition.SCALE;
     	}
     	else if (IsAtSwitch())
     	{
-    		_previousPosition = _currentPosition;
+    		if (_currentPosition == ElevatorPosition.MIN && _aboveBelow == ElevatorPosition.BELOWSWITCH)
+    			_aboveBelow = ElevatorPosition.ABOVESWITCH;
+    		
+    		else if (_currentPosition == ElevatorPosition.SWITCH && _aboveBelow == ElevatorPosition.ABOVESWITCH)
+    			_aboveBelow = ElevatorPosition.BELOWSWITCH;
+    		else
+    			_aboveBelow = ElevatorPosition.ABOVESWITCH;
+    		
     		_currentPosition = ElevatorPosition.SWITCH;
     	}
     		
     	else if (IsAtMax())
     	{
-    		_previousPosition = _currentPosition;
     		_currentPosition = ElevatorPosition.MAX;
     	}
     		
     	else if (IsAtMin())
     	{
-    		_previousPosition = _currentPosition;
     		_currentPosition = ElevatorPosition.MIN;
     	}
     		

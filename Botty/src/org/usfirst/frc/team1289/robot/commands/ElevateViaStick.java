@@ -63,9 +63,6 @@ public class ElevateViaStick extends Command {
     		speed = 1.0;
     	else speed = speed;
     	
-    	// will turn color if above switch and reverse direction to go down
-    	// or if below and reverse direction to go up
-    	// how to avoid needing to know context?
     	if (_elevator.LastKnownPosition() == ElevatorPosition.ABOVESWITCH)
     		_lighting.SetColor(LightingColor.GREEN);
     	else if (_elevator.LastKnownPosition() == ElevatorPosition.BELOWSWITCH)

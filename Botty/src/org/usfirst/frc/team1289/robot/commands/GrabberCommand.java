@@ -63,7 +63,7 @@ public class GrabberCommand extends Command
     	double t = _timer.get();
     	double limit = _parameters.GrabberTimer();
     	
-    	System.out.printf("%f\t%f\n", t, limit);
+    	//System.out.printf("%f\t%f\n", t, limit);
     	if (t > limit & _direction == GrabberDirection.SPEW)
     	{
     		System.out.println("done");
@@ -76,7 +76,7 @@ public class GrabberCommand extends Command
     // Called once after isFinished returns true
     protected void end() 
     {
-    	System.out.println("command end");
+    //	System.out.println("command end");
     	_grabber.StopAllMotors();
     }
 
@@ -84,7 +84,7 @@ public class GrabberCommand extends Command
     // subsystems is scheduled to run
     protected void interrupted() 
     {
-    	System.out.println("Interupted");
+    	//System.out.println("Interupted");
     	_grabber.StopAllMotors();
     }
 }
