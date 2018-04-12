@@ -50,7 +50,7 @@ public class ActuateRetractor extends Command
     	if (_direction == RetractorDirection.UP && _retractor.IsAtLimit())
 			return true;
     	else
-    		if (_direction == RetractorDirection.DOWN && _timer.get() > 1.0)
+    		if (_direction == RetractorDirection.DOWN && _timer.get() > 0.875)
     			return true;
     	
         return false;

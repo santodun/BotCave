@@ -20,9 +20,9 @@ public class DriveToDistance extends Command {
     // Called just before this Command runs the first time
     protected void initialize() 
     {
+    	System.out.printf("DT init %f\n", _distance);
     	_driveTrain.Reset();
     	_driveTrain.InitEncoderPID(_distance);
-    	System.out.println("D2D init");
     }
 
     // Called repeatedly when this Command is scheduled to run
