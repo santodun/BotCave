@@ -3,6 +3,8 @@ package org.usfirst.frc.team1289.robot.subsystems;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.Timer;
+import org.usfirst.frc.team1289.robot.OperatingParameters;
 
 /**
  *
@@ -17,9 +19,12 @@ public class Elevator extends Subsystem
 	private static ElevatorPosition _currentPosition;
 	private static ElevatorPosition _aboveBelow;
 	private static double _speed;
+	private static Timer _timer;
+	private static OperatingParameters _parameters;
 	
 	public Elevator(SpeedController motor, DigitalInput maxLimitSwitch, DigitalInput minLimitSwitch,
-						DigitalInput scaleLimitSwitch, DigitalInput switchLimitSwitch)
+						DigitalInput scaleLimitSwitch, DigitalInput switchLimitSwitch, 
+						OperatingParameters parameters)
 	{
 		_motor = motor;
 		_maxLimit = maxLimitSwitch;
@@ -30,6 +35,10 @@ public class Elevator extends Subsystem
 		_aboveBelow = ElevatorPosition.BELOWSWITCH;
 		_speed = 0.0;
 		_motor.setInverted(true);
+		_timer = new Timer();
+		_parameters = parameters;
+		
+		_timer.reset();
 	}
 	
     public void initDefaultCommand() {
@@ -76,12 +85,17 @@ public class Elevator extends Subsystem
     //	System.out.println(scaledSpeed);
     	_motor.set(scaledSpeed);
     	
-    	if (IsAtScale())
-    	{	
-    		_currentPosition = ElevatorPosition.SCALE;
-    	}
-    	else if (IsAtSwitch())
-    	{
+//    	if (IsAtScale())
+//    	{	
+//    		_currentPosition = ElevatorPosition.SCALE;
+//    	}
+    	//else
+    	
+    	
+    	if (IsAtSwitch() && _timer.get() == 0.0)    		
+		{ 
+			_timer.start();
+			
     		if (_currentPosition == ElevatorPosition.MIN && _aboveBelow == ElevatorPosition.BELOWSWITCH)
     			_aboveBelow = ElevatorPosition.ABOVESWITCH;
     		
@@ -91,20 +105,26 @@ public class Elevator extends Subsystem
     			_aboveBelow = ElevatorPosition.ABOVESWITCH;
     		
     		_currentPosition = ElevatorPosition.SWITCH;
-    	}
-    		
-    	else if (IsAtMax())
+		}	
+    	
+    	if (_timer.hasPeriodPassed(_parameters.GetLightingDeadband()))  // 1/2 second debounce
     	{
-    		_currentPosition = ElevatorPosition.MAX;
+    		_timer.stop();
+    		_timer.reset();
     	}
-    		
-    	else if (IsAtMin())
-    	{
-    		_currentPosition = ElevatorPosition.MIN;
-    	}
-    		
-    	else
-    		foo = false; 
+    	
+//    	else if (IsAtMax())
+//    	{
+//    		_currentPosition = ElevatorPosition.MAX;
+//    	}
+//    		
+//    	else if (IsAtMin())
+//    	{
+//    		_currentPosition = ElevatorPosition.MIN;
+//    	}
+//    		
+//    	else
+//    		foo = false; 
     }
     
     public void Stop()

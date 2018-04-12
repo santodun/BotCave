@@ -124,7 +124,8 @@ public class Robot extends IterativeRobot {
        	// Subsystems
     	_driveTrain = new DriveTrain(_leftFrontMotor, _rightFrontMotor, _leftRearMotor, _rightRearMotor,
 				_leftEncoder, _rightEncoder, _gyro, _driveTrainRangeFinder, _driveJoyStick, _operatingParameters);
-    	_elevator = new Elevator(_elevatorMotor, _elevatorMaxBreaker, _elevatorMinBreaker, _elevatorScaleBreaker, _elevatorSwitchBreaker);
+    	_elevator = new Elevator(_elevatorMotor, _elevatorMaxBreaker, _elevatorMinBreaker, 
+    			_elevatorScaleBreaker, _elevatorSwitchBreaker, _operatingParameters);
     	
     	_grabber = new Grabber(_grabberLeftMotor, _grabberRightMotor, /*_grabberBreakerLeft, _grabberBreakerRight,*/ _operatingParameters);
     	_retractor = new Retractor(_retractorMotor, _retractorBreaker);

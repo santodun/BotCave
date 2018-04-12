@@ -63,7 +63,7 @@ public class ElevateViaStick extends Command {
     		speed = 1.0;
     	else speed = speed;
     	
-    	if (_elevator.LastKnownPosition() == ElevatorPosition.ABOVESWITCH)
+		if (_elevator.LastKnownPosition() == ElevatorPosition.ABOVESWITCH)
     		_lighting.SetColor(LightingColor.GREEN);
     	else if (_elevator.LastKnownPosition() == ElevatorPosition.BELOWSWITCH)
     		_lighting.SetColor(LightingColor.RED);

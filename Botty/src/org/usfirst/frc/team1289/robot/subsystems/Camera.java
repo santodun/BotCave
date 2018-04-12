@@ -1,13 +1,13 @@
-		package org.usfirst.frc.team1289.robot.subsystems;
+package org.usfirst.frc.team1289.robot.subsystems;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
-import org.opencv.core.Mat;				/**santosh*/
+import org.opencv.core.Mat;				
 import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.UsbCamera;
 
-import edu.wpi.first.wpilibj.CameraServer;  /** added by Santosh 012817 **/
+import edu.wpi.first.wpilibj.CameraServer;  
 
 
 /**
@@ -25,7 +25,7 @@ public class Camera extends Subsystem {
     
     public void Start() 
     {
-    	//CameraServer.getInstance().startAutomaticCapture();			/** Santosh 01282017 **/
+    	//CameraServer.getInstance().startAutomaticCapture();		
        
         
         new Thread(() -> {

@@ -41,6 +41,8 @@ public class OperatingParameters
 	private String _autoCenterRotateKey = "AutoCenterRotate";
 	private String _grabberTimerKey = "GrabberTimer";
 	
+	private String _lightingDeadbandKey = "LightingDeadband";
+	
 	private String _testStringKey = "TestStringKey";
 	
 	// Values
@@ -74,6 +76,7 @@ public class OperatingParameters
 	private double _retractorSpeed = 0.7;
 	private int _autoCenterRotate = 30;
 	private double _grabberTimer = 1.0;
+	private double _lightingDeadband = 0.1;
 	private String _testString = "foo";
 	
 	public OperatingParameters()
@@ -109,12 +112,18 @@ public class OperatingParameters
 		_preferences.putDouble(_retractorSpeedKey, _retractorSpeed);
 		_preferences.putInt(_autoCenterRotateKey, _autoCenterRotate);
 		_preferences.putDouble(_grabberTimerKey, _grabberTimer);
+		_preferences.putDouble(_lightingDeadbandKey, _lightingDeadband);
 		_preferences.putString(_testStringKey, _testString);
 	}
 	
 	public String TestString()
 	{
 		return _preferences.getString(_testStringKey, _testString);
+	}
+	
+	public double GetLightingDeadband()
+	{
+		return _preferences.getDouble(_lightingDeadbandKey, _lightingDeadband);
 	}
 	
 	public int AutoSideInitialHeading()
