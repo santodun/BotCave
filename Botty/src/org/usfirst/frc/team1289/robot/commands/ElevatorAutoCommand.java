@@ -65,7 +65,10 @@ public class ElevatorAutoCommand extends Command
     	if (_targetPosition == ElevatorPosition.SWITCH)
     	{
     		if (_elevator.IsAtSwitch())
-    			return true;
+                {
+                    _elevator.Move(0.4);
+                    //return true;
+                }
     	}
     	
     	if (_elevator.IsAtMax() && _elevator.GetCurrentSpeed() > 0)
