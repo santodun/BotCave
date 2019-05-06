@@ -1,110 +1,235 @@
 
 package org.usfirst.frc.team1289.robot.subsystems;
 
-import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.command.PIDSubsystem;
+//import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Talon;
 
-import org.usfirst.frc.team1289.robot.OperatorInterface;
-import org.usfirst.frc.team1289.robot.Robot;
+//import org.usfirst.frc.team1289.robot.Robot;
+import org.usfirst.frc.team1289.robot.OperatingParameters;
 import org.usfirst.frc.team1289.robot.commands.*;
 
-import edu.wpi.first.wpilibj.Counter;
 
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.Counter;
+import org.usfirst.frc.team1289.robot.subsystems.RangeFinder;
 /**
  *
  */
-public class DriveTrain extends Subsystem 
+public class DriveTrain extends PIDSubsystem 
 {
     
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-	private static Talon _leftFrontMotor;
-	private static Talon _rightFrontMotor;
-	private static Talon _leftRearMotor;
-	private static Talon _rightRearMotor;
-	private static Counter _leftEncoder;
-	private static Counter _rightEncoder; 
-	private static RobotDrive _robotDrive;
+	private static SpeedController _leftFrontMotor;
+	private static SpeedController _rightFrontMotor;
+	private static SpeedController _leftRearMotor;
+	private static SpeedController _rightRearMotor;
+	private static SpeedControllerGroup _leftMotors, _rightMotors;
+	private static Talon _dummyMotor1 = new Talon(10);
+	private static Talon _dummyMotor2 = new Talon(11);
+	private static Counter _leftFrontEncoder;
+	private static Counter _rightFrontEncoder; 
+	//private static Counter _leftRearEncoder;
+	//private static Counter _rightRearEncoder; 
+	private static DifferentialDrive _robotDrive;
+	private static Joystick _joystick;
+	private static OperatingParameters _parameters;
+	private static RangeFinder _rangeFinder;
+	private static AnalogGyro _gyro;
+	private static double _pidOutput;
 	
-	public DriveTrain(int io_leftFront, int io_rightFront,
-						int io_leftRear, int io_rightRear,
-						int io_leftEncoder, int io_rightEncoder)
-	{
-		_leftFrontMotor = new Talon(io_leftFront);
-		_rightFrontMotor = new Talon(io_rightFront);
-		_leftRearMotor = new Talon(io_leftRear);
-		_rightRearMotor = new Talon(io_rightRear);
+	private static PIDController _encoderPID;
+	private static PIDController _rotatePID;
 		
-		_robotDrive = new RobotDrive(_leftFrontMotor, _leftRearMotor,
-									_rightFrontMotor, _rightRearMotor);
+	public DriveTrain(SpeedController leftFront, SpeedController rightFront, SpeedController leftRear, SpeedController rightRear,
+						Counter leftEncoder, Counter rightEncoder, AnalogGyro gyro, RangeFinder rangeFinder,
+						Joystick joystick, OperatingParameters parameters)
+	{		
+		super("DriveTrain", parameters.DT_DriveStraightPGain(), parameters.DT_DriveStraightIGain(), parameters.DT_DriveStraightDGain());
+	// System.out.println(parameters.DriveTrainPIDProportion());
+		_leftFrontMotor = leftFront;
+		_leftRearMotor = leftRear;
+		_leftFrontMotor.setInverted(true);
+		_leftRearMotor.setInverted(true);
+		_leftMotors = new SpeedControllerGroup(_leftFrontMotor, _leftRearMotor);
 		
-		_robotDrive.setSafetyEnabled(true);
+		_rightFrontMotor = rightFront;
+		_rightRearMotor = rightRear;
+		_rightFrontMotor.setInverted(true);
+		_rightRearMotor.setInverted(true);
+		_rightMotors = new SpeedControllerGroup(_rightFrontMotor, _rightRearMotor);
+		
+		_robotDrive = new DifferentialDrive(_leftMotors, _rightMotors);
+		
+		_robotDrive.setSafetyEnabled(false);
 		_robotDrive.setExpiration(0.1);
-		_robotDrive.setSensitivity(0.1);
 		_robotDrive.setMaxOutput(1.0);
-		_robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
-        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
-        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
-        _robotDrive.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
-        
-    	_leftEncoder = new Counter(io_leftEncoder);
-		_rightEncoder = new Counter(io_rightEncoder);
+		
+    	_leftFrontEncoder = leftEncoder;
+		_rightFrontEncoder = rightEncoder;
 	
 		double wheelDiameter = 6.0;
 		double pulsesPerRotation = 6.0;
 		double pulseDistance = (wheelDiameter * Math.PI) / pulsesPerRotation; 
 				
-		_leftEncoder.setDistancePerPulse(pulseDistance);
-		_rightEncoder.setDistancePerPulse(pulseDistance);
+		_leftFrontEncoder.setDistancePerPulse(pulseDistance);
+		_rightFrontEncoder.setDistancePerPulse(pulseDistance);
 		
+		_joystick = joystick;
+		_parameters = parameters;
+		_rangeFinder = rangeFinder;
+		
+		_gyro = gyro;
+		_gyro.calibrate();
+		_gyro.reset();
+		
+		setSetpoint(0.0);
+		setAbsoluteTolerance(1.0);
+		setInputRange(-90.0, 90.0); 
+		setOutputRange(-0.1, 0.1);
+		getPIDController().setContinuous(true);
+		enable();
+		
+		_encoderPID = new PIDController(parameters.DT_DriveDistancePGain(), parameters.DT_DriveDistanceIGain(), parameters.DT_DriveDistanceDGain(), _leftFrontEncoder, _dummyMotor1);
+		_rotatePID = new PIDController(parameters.DT_RotatePGain(), parameters.DT_RotateIGain(), parameters.DT_RotateDGain(), _gyro, _dummyMotor2);
 	}
-	    
+	 
+	public void InitEncoderPID(double distance)
+	{
+		if (! _encoderPID.isEnabled())
+		{
+			//System.out.printf("InitEncoderPID %f\n", distance);
+			_encoderPID.setSetpoint(distance);
+			_encoderPID.setAbsoluteTolerance(5.0);
+			_encoderPID.setInputRange(0.0, 500.0);
+			_encoderPID.setOutputRange(-0.4, 0.4);
+			_encoderPID.setContinuous(true);
+			_leftFrontEncoder.setPIDSourceType(PIDSourceType.kDisplacement);
+			_encoderPID.enable();
+		}
+	}
+
+	public void InitRotatePID(int heading)
+	{
+		if (! _rotatePID.isEnabled())
+		{
+			_rotatePID.setSetpoint(heading);
+			_rotatePID.setAbsoluteTolerance(0.5);
+			_rotatePID.setInputRange(-100.0, 100.0);
+			_rotatePID.setOutputRange(-0.4, 0.4);
+			_rotatePID.setContinuous(true);
+			_gyro.setPIDSourceType(PIDSourceType.kDisplacement);
+			_rotatePID.enable();
+		}
+	}
+	
+	public boolean EncoderPIDAtTarget()
+	{
+		return _encoderPID.onTarget();
+	}
+	
+	public boolean RotatePIDAtTarget()
+	{
+		return _rotatePID.onTarget();
+	}
+	
+	
+	@Override
+	 protected double returnPIDInput()
+	 {
+		double angle = _gyro.getAngle();
+		//System.out.printf("%.2f\t", angle);
+		 return angle; //_gyro.getAngle();
+	 }
+	 
+	@Override
+	 protected void usePIDOutput(double output)
+	 {
+		// System.out.printf("%f %f\n", getPIDController().getError(), output);
+		//System.out.printf("%.2f\n", output);
+		 _pidOutput = output;
+	 }
+	 
 	public void initDefaultCommand() 
     {
         // Set the default command for a subsystem here.
         //setDefaultCommand(new DriveViaJoystick());
     	//setDefaultCommand(new DriveViaEncoder());
     }
-    
+
     // Sets the motor speed of all motors to the desired setting
     // no rotation value, so no turning. This moves fwd/bkwd only
     public void Move(double speed)
     {
     	boolean squareInputs = false; 
-    	_robotDrive.arcadeDrive(0.3 /*speed*/, 0.0, squareInputs);
+    	System.out.printf("Dt move %d %f\n", _leftFrontEncoder.get(), _encoderPID.get());
+    	_robotDrive.arcadeDrive(_encoderPID.get(), _pidOutput, squareInputs);
+    }
+    
+    public void Rotate(RotationDirection direction)
+    {
+//    	double speed = _parameters.RotationSpeed();
+//    	double rotate = _parameters.RotateRotation();
+    //	System.out.printf("Rotate %f\n",  _gyro.getAngle());
+//    	
+    	_robotDrive.arcadeDrive(0.0,  _rotatePID.get(), false);
+    	
+//    	//System.out.printf("%f, %f\n",  speed, rotate);
+//    	if (direction == RotationDirection.CLOCKWISE)
+//    		_robotDrive.arcadeDrive(speed, rotate, false);
+//    	else
+//    		_robotDrive.arcadeDrive(-speed, -rotate, false);
+    }
+    
+    public double GetHeading()
+    {
+    	return _gyro.getAngle();
     }
 
     // Scale the raw value into a piecewise linear equation
     private double ScaleValue(double rawValue)
     {
 
-    	double deadBand = SmartDashboard.getNumber("Drivetrain Deadband", 0.05);
+    	double deadBand = _parameters.DriveTrainDeadBand();
     	if (-deadBand < rawValue && rawValue < deadBand)
     		return 0.0;
     	else
-    		return (rawValue < 0.0) ? Math.pow(rawValue + deadBand, 3) : Math.pow(rawValue - deadBand, 3);
-    
+    		return (rawValue < 0.0) ? Math.pow(rawValue + deadBand, 3) : Math.pow(rawValue - deadBand, 3); 
     }
     
-    public void ArcadeDrive()
+    public void StickDrive(boolean halfSpeedMode)
     {
-    	/* Note the negatation */
-    	double moveValue = - Robot.driverStation.joyStick.getY();
-    	double rotateValue = - Robot.driverStation.joyStick.getX();
-    	
-    	SmartDashboard.putNumber("stickRawMoveValue", moveValue);
-    	SmartDashboard.putNumber("stickRawRotateValue", rotateValue);
-    	
+    	double moveValue =  - _joystick.getY();
+    	double rotateValue =  _joystick.getX();
+    	  	
     	moveValue = ScaleValue(moveValue);
     	rotateValue = ScaleValue(rotateValue);
     	
-    	SmartDashboard.putNumber("stickScaledMoveValue", moveValue);
-    	SmartDashboard.putNumber("stickScaledRotateValue", rotateValue);
+    	if (halfSpeedMode)
+    	{
+    		moveValue = moveValue * 0.5;
+    		rotateValue = rotateValue * 0.9;
+    	}
     	
     	_robotDrive.arcadeDrive(moveValue, rotateValue);
+    }
+    
+    public double RangeToTargetInMM()
+    {
+    	return _rangeFinder.GetRangeInMM();
+    }
+
+    public double RangeToTargetInInches()
+    {
+    	return _rangeFinder.GetRangeInInches();
     }
     
     public void Stop()
@@ -112,30 +237,38 @@ public class DriveTrain extends Subsystem
     	_robotDrive.stopMotor();
     }
     
-    public double GetLeftEncoderDistance()
+    public double GetLeftFrontEncoderDistance()
     {
-    	return _leftEncoder.getDistance();
+    	return _leftFrontEncoder.getDistance();
     }
     
-    public double GetRightEncoderDistance()
+    public double GetRightFrontEncoderDistance()
     {
-    	return _rightEncoder.getDistance();
+    	return _rightFrontEncoder.getDistance();
     }
     
-    public int GetRightEncoderCount()
+    public int GetLeftFrontEncoderCount()
     {
-    	return  _rightEncoder.get();
+    	return _leftFrontEncoder.get();
     }
     
-    public int GetLeftEncoderCount()
+    public int GetRightFrontEncoderCount()
     {
-    	return _leftEncoder.get();
+    	return  _rightFrontEncoder.get();
     }
-    
-   public void ResetEncoders()
+      
+   public void Reset()
    {
-	   _leftEncoder.reset();
-	   _rightEncoder.reset();
+	   Stop();
+	   _leftFrontEncoder.reset();
+	   _rightFrontEncoder.reset();
+	   _gyro.reset();
+	   
+	   if (_encoderPID.isEnabled())
+		   _encoderPID.disable();
+		
+	   if (_rotatePID.isEnabled())
+		   _rotatePID.disable();
    }
 }
 

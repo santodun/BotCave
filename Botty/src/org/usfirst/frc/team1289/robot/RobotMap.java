@@ -6,25 +6,41 @@ package org.usfirst.frc.team1289.robot;
  * floating around.
  */
 public class RobotMap {
-    // For example to map the left and right motors, you could define the
-    // following variables to use with your drivetrain subsystem.
-    // public static int leftMotor = 1;
-    // public static int rightMotor = 2;
-    
-    // If you are using multiple modules, make sure to define both the port
-    // number and the module. For example you with a rangefinder:
-    // public static int rangefinderPort = 1;
-    // public static int rangefinderModule = 1;
-	public static final int PWM_DriveTrainLeftFrontMotor = 0;
-	public static final int PWM_DriveTrainRightFrontMotor = 1;
-	public static final int PWM_DriveTrainLeftRearMotor = 2;
-	public static final int PWM_DriveTrainRightRearMotor = 3;
-	public static final int PWM_WinchMotor = 4;
+
+	public static final int PWM_leftFrontMotor = 0;
+	public static final int PWM_rightFrontMotor = 1;
+	public static final int PWM_leftRearMotor = 2;
+	public static final int PWM_rightRearMotor = 3;
+	public static final int PWM_elevatorMotor = 4;
+	public static final int PWM_grabberLeftMotor = 5;
+	public static final int PWM_retractorMotor = 6;
+	public static final int PWM_grabberRightMotor = 7;
+	public static final int PWM_LEDs = 8;
 		
-	public static final int DIO_DriveTrainLeftEncoder = 0;
-	public static final int DIO_DriveTrainRightEncoder = 1;
-	public static final int DIO_WinchLimitSwitch = 2;
 	
-	public static final int IO_JoystickPort = 0;
-	public static final int IO_ButtonStationPort = 0;
+	
+	public static final int DIO_leftEncoder = 0;
+	public static final int DIO_rightEncoder = 1;
+//	public static final int DIO_grabberBreakerLeft = 2;  //port1
+//	public static final int DIO_grabberBreakerRight = 3; //port2
+	public static final int DIO_ElevatorMaxBreaker = 4;
+	public static final int DIO_ElevatorMinBreaker = 5;
+	public static final int DIO_ElevatorSwitchBreaker = 6;
+	public static final int DIO_ElevatorScaleBreaker = 7;
+	public static final int DIO_RetractorBreaker = 8;
+	
+	public static final int IO_ButtonStation = 0;
+	public static final int IO_DriveJoystick = 0;
+	public static final int IO_ElevatorJoystick = 1;
+	
+	public static final int IO_GrabberIngestButton = 1;
+	public static final int IO_GrabberSpewButton = 2;
+	public static final int IO_RetractorRetractButton = 3;
+	public static final int IO_RetractorDeployButton = 4;
+	public static final int IO_HalfSpeedButton = 1;
+	
+	public static final int AIO_Gyroscope = 0;
+	public static final int AIO_DriveTrainRangeFinder = 1;
 }
+	
+

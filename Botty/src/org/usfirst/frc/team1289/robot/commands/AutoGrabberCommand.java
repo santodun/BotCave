@@ -1,55 +1,44 @@
 package org.usfirst.frc.team1289.robot.commands;
 
-import org.usfirst.frc.team1289.robot.OperatorInterface;
-import org.usfirst.frc.team1289.robot.Robot;
-import org.usfirst.frc.team1289.robot.commands.*;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
+import org.usfirst.frc.team1289.robot.subsystems.Grabber;
 
 /**
  *
  */
-public class WinchRaise extends Command 
+public class AutoGrabberCommand extends Command 
 {
-	private static boolean _isDone = false; 
 
-    public WinchRaise() 
+	Grabber _grabber;
+	
+    public AutoGrabberCommand(Grabber grabber) 
     {
-        // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
-    	requires(Robot.winch);
+    	_grabber = grabber;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() 
     {
-    	Robot.winch.Stop();
-    	Robot.winch.Reset();
+    	//System.out.println("grabbercommand");
+    //	_grabber.SetGrabberInitialState(GrabberState.CLOSED);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() 
     {
-    	if (! _isDone)
-    		Robot.winch.Raise();
+    	//_grabber.ActuateGrabber(_direction????);    	
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() 
     {
-    	if (Robot.winch.IsAtLimit())
-    	{
-    		//Timer.delay(1.0);
-    		_isDone = true;
-    	}
-    	return _isDone;
+        return false; //_grabber.IsDone();
     }
 
     // Called once after isFinished returns true
     protected void end() 
     {
-    	Robot.winch.Stop();
+    	_grabber.StopAllMotors();
     }
 
     // Called when another command which requires one or more of the same
